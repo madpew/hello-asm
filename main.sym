@@ -5,10 +5,9 @@
 00:0157 InitializeDMA.loop
 00:0164 DMACode.waitDMA
 00:0150 InitializeDMA
-00:0029 InterruptLCDC
-00:0038 InterruptLCDC.done
+00:0026 InterruptLCDC
+00:0035 InterruptLCDC.done
 00:0193 BootSequence
-00:0013 OnVBlank
 00:0000 GameLoop
 00:00CA TurnScreenOff
 00:00E5 ClearAllSprites

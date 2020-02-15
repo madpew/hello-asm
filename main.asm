@@ -104,12 +104,8 @@ GameLoop:
 	ld a, [wInterruptFlags]
 	
 	bit IEF_VBLANK, a ;vblank
-	jp nz, OnVBlank
+	jr z, GameLoop
 	
-	; some other interrupt happened, just wait for the next
-	jr GameLoop
-
-OnVBlank:
 	; reset vblank flag
 	res IEF_VBLANK, a
 	ld [wInterruptFlags], a
@@ -123,7 +119,7 @@ OnVBlank:
 	ld [wFrameCounter], a
    
 	jp GameTick
-	
+
 include "utils.asm"
 include "data/data.inc"
 include "sounds.asm"
