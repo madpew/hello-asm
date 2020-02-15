@@ -1,8 +1,9 @@
 include "hardware.inc"
 include "macros.inc"
 ;--------------------------------
-include "ram.inc"
-include "interrupts.inc"
+
+include "ram.asm"
+include "interrupts.asm"
 
 SECTION	"BOOT", ROM0[$0100]
     nop
@@ -39,24 +40,17 @@ bootsequence:
 	call soundOff
 	
 	; shut down screen
-    ld  a, [rSTAT]   
-    and STATF_BUSY  
-    jr  nz,@-4
-
-	; Turn off the LCD
-
-    ;ld	a, [rLCDC]
-    ;res	7, a			; Reset bit 7 of LCDC
-    seta [rLCDC], LCDCF_OFF
+    call turnScreenOffSafe
+	xor a
+    ld [rLCDC], a
 	
-	; gfx setup
-	;seta [rBGP], %11100100 ; default palette
+	; palette setup
 	ld a, [rBGP]
 	ld [paletteBg], a
-	;seta [rOBP0], %11100100 ; default palette
+	
 	ld a, [rOBP0]
 	ld [paletteObj0], a
-	;seta [rOBP1], %11100100 ; default palette
+	
 	ld a, [rOBP1]
 	ld [paletteObj1], a
 	
@@ -66,31 +60,37 @@ bootsequence:
 	ld [rSCY], a
 	ld [camScrollX], a
 	ld [camScrollY], a
-	ld [currentScene], a
 	
-	call clearSprites
+	ld [currentScene], a	; start with scene 0
+	ld [intFlags], a		; reset interrupt flags
+	
+	;init sprites
+	call clearAllSprites
 	
 	; setup timer
 	;seta [rTMA], 190 ;~60 fps
 	;seta [rTAC], TACF_START | TACF_4KHZ
 	
-	seta [rSTAT], %00001000
-	seta [rIE], IEF_VBLANK  | IEF_LCDC
+	ld a, %00001000
+	ld [rSTAT], a
+	
+	ld a, IEF_VBLANK | IEF_LCDC
+	ld [rIE], a
 	
 	; turn on screen
-	seta	[rLCDC], LCDCF_OFF | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON 
+	ld a, LCDCF_OFF | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON 
+	ld [rLCDC], a
+	
+	;setup
+	call initDMA
 	
 	ei ; enable interrupts 
 
-	call gameInit
+	jp gameInit
 
 SECTION "MAINLOOP", ROM0  
 gameloop:
 
-	; clear the interrupt flags
-	xor a
-	ld [intFlags], a
-	
 	; make sure the display is on
 	ld a, [rLCDC]
 	set 7, a
@@ -110,6 +110,10 @@ gameloop:
 	jp gameloop
 
 onVBlank:
+	; reset vblank flag
+	res IEF_VBLANK, a
+	ld [intFlags], a
+	
 	ld a, [timeFrames]
 	inc a
 	ld [timeFrames], a
@@ -120,7 +124,7 @@ onVBlank:
    
 	jp gameOnVBlank
 	
-include "utils.inc"
-include "data.inc"
+include "utils.asm"
+include "data/data.inc"
 include "sounds.asm"
 include "game.asm"

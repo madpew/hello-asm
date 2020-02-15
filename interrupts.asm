@@ -15,24 +15,44 @@ SECTION	"INT_p1thru4",ROM0[$0060]
 
 
 
-SECTION "VSYNC", ROM0
-intVBlank:
+SECTION "VBLANK", ROM0
 
-	push af
-	push bc
-	push hl
+; setup OAM-DMA routine in high ram
+initDMA:
 
-	; setup OAM-DMA routine in High Ram
 	ld c, $80
-	ld b, 12
+	ld b, 10
 	ld hl, dmacode
 .loop:
 	ld a, [hli]
 	ld [c], a
 	inc c
 	dec b
-	jr nz, .loop	
+	jr nz, .loop
 	
+	ret
+
+
+dmacode:
+	; $c000 is the location to copy from (shadow oam)
+	
+	ld a, $c0
+	ld [rDMA], a
+	
+	ld a, 40
+	
+.waitDMA:
+	dec a
+	jr nz, .waitDMA
+	
+	ret
+	
+intVBlank:
+
+	push af
+	push bc
+	push hl
+
 	; dma-update OAM
 	call $ff80
 	
@@ -53,10 +73,9 @@ intVBlank:
 	ld [rSCY], a
 	
 	;set vblank flag
-	xor a
+	ld a, [intFlags]
 	set IEF_VBLANK, a
 	ld [intFlags], a
-	
 	
 	pop hl
 	pop bc
@@ -64,12 +83,7 @@ intVBlank:
 	
 	reti
 	
-; short code fragment that gets loaded into hiram to initiate dma-transfer
-; $c0 is the location to copy from	
-dmacode:
-	;db	$3e, $c0, $e0, $46, $3e, $28, $3d, $20, $fd, $c9
-	db $f3, $3e, $c0, $e0, $46, $3e, $38, $3d, $20, $fd, $fb, $c9 ;safer version with disabled interrupts
-	;extended wait from $28 to $38
+
 
 SECTION "HSYNC", ROM0
 intLCDC:
@@ -82,11 +96,14 @@ intLCDC:
 	;jp nz, .done
 	
 	ld a, [rLY]
-	cp a, 100
-	jp nc, .done
+	cp a, 140
+	jr nc, .done ; exit if we're past line 140
 	
-	ld a, [rOBP0]
-	xor a, $FF
+	
+	cp a, 92+16
+	jr c, .done ; LY < cmp 
+	;LY > 92+16
+	ld a, %01000100
 	ld [rOBP0], a
 	
 .done: 

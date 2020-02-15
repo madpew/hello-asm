@@ -1,8 +1,9 @@
 soundOff:
 	xor a 
-    ld [rAUDVOL], a		; Turn off the audio volume 
-    ld [rAUDTERM], a	; Output no channels to no left/right speakers (when using headphones)
-    ld [rAUDENA], a		; Turn audio off 
+    ld [rAUDVOL], a
+    ld [rAUDTERM], a
+    ld [rAUDENA], a
+    
     ret
     
 soundOn:
@@ -10,4 +11,5 @@ soundOn:
     ld [rAUDVOL], a
     ld [rAUDTERM], a
     ld [rAUDENA], a
+    
     ret
