@@ -1,8 +1,8 @@
 SECTION	"INT_Vblank",ROM0[$0040]
-	jp intVBlank
+	jp InterruptVBlank
 	
 SECTION	"INT_LCDC",ROM0[$0048]
-	jp intLCDC
+	jp InterruptLCDC
 
 SECTION	"INT_Timer_Overflow",ROM0[$0050]
 	reti
@@ -18,11 +18,11 @@ SECTION	"INT_p1thru4",ROM0[$0060]
 SECTION "VBLANK", ROM0
 
 ; setup OAM-DMA routine in high ram
-initDMA:
+InitializeDMA:
 
 	ld c, $80
 	ld b, 10
-	ld hl, dmacode
+	ld hl, DMACode
 .loop:
 	ld a, [hli]
 	ld [c], a
@@ -33,7 +33,7 @@ initDMA:
 	ret
 
 
-dmacode:
+DMACode:
 	; $c000 is the location to copy from (shadow oam)
 	
 	ld a, $c0
@@ -47,7 +47,7 @@ dmacode:
 	
 	ret
 	
-intVBlank:
+InterruptVBlank:
 
 	push af
 	push bc
@@ -57,25 +57,25 @@ intVBlank:
 	call $ff80
 	
 	; update palettes
-	ld a, [paletteBg]
+	ld a, [wPaletteBg]
 	ld [rBGP], a
 	
-	ld a, [paletteObj0]
+	ld a, [wPaletteObj0]
 	ld [rOBP0], a
 	
-	ld a, [paletteObj1]
+	ld a, [wPaletteObj1]
 	ld [rOBP1], a
 	
 	; reset/update scroll
-	ld a, [camScrollX]
+	ld a, [wCamScrollX]
 	ld [rSCX], a
-	ld a, [camScrollY]
+	ld a, [wCamScrollY]
 	ld [rSCY], a
 	
 	;set vblank flag
-	ld a, [intFlags]
+	ld a, [wInterruptFlags]
 	set IEF_VBLANK, a
-	ld [intFlags], a
+	ld [wInterruptFlags], a
 	
 	pop hl
 	pop bc
@@ -86,7 +86,7 @@ intVBlank:
 
 
 SECTION "HSYNC", ROM0
-intLCDC:
+InterruptLCDC:
 
 	push af
 

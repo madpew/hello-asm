@@ -7,14 +7,19 @@
             "label": "build",
             "type": "shell",
             "group": "build",
-            "options": { "cwd": "${workspaceFolder}"},
-            "command": "${cwd}\\assemble.bat"
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "command": "${cwd}\\assemble.bat",
+            "problemMatcher": []
         },
         {
             "label": "run",
             "type": "shell",
             "group": "build",
-            "options": { "cwd": "${workspaceFolder}"},
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "command": "bgb ${cwd}\\*.gb"
         }
     ]

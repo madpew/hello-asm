@@ -7,9 +7,6 @@
         {
             "request": "launch",
             "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
             "program": "assemble.bat ${file}"
         }
     ]

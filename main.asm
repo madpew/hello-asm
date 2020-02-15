@@ -7,7 +7,7 @@ include "interrupts.asm"
 
 SECTION	"BOOT", ROM0[$0100]
     nop
-    jp	bootsequence
+    jp	BootSequence
     
 	;ROM_HEADER	ROM_NOMBC, ROM_SIZE_32KBYTE, RAM_SIZE_0KBYTE
 	
@@ -30,42 +30,42 @@ SECTION	"BOOT", ROM0[$0100]
 	dw 0                        ; $14e - Checksum (not important)
 
 SECTION	"BOOTSEQ", ROM0
-bootsequence:
+BootSequence:
 
 	di					; disable interrupts
 	
 	ld	sp, $ffff		; setup stack to highest mem location we can use + 1
 	
 	;turn off sound to save battery
-	call soundOff
+	call SoundOff
 	
 	; shut down screen
-    call turnScreenOffSafe
+    call TurnScreenOff
 	xor a
     ld [rLCDC], a
 	
 	; palette setup
 	ld a, [rBGP]
-	ld [paletteBg], a
+	ld [wPaletteBg], a
 	
 	ld a, [rOBP0]
-	ld [paletteObj0], a
+	ld [wPaletteObj0], a
 	
 	ld a, [rOBP1]
-	ld [paletteObj1], a
+	ld [wPaletteObj1], a
 	
 	;setup scroll
 	xor a
 	ld [rSCX], a
 	ld [rSCY], a
-	ld [camScrollX], a
-	ld [camScrollY], a
+	ld [wCamScrollX], a
+	ld [wCamScrollY], a
 	
-	ld [currentScene], a	; start with scene 0
-	ld [intFlags], a		; reset interrupt flags
+	ld [wCurrentScene], a	; start with scene 0
+	ld [wInterruptFlags], a		; reset interrupt flags
 	
 	;init sprites
-	call clearAllSprites
+	call ClearAllSprites
 	
 	; setup timer
 	;seta [rTMA], 190 ;~60 fps
@@ -82,14 +82,14 @@ bootsequence:
 	ld [rLCDC], a
 	
 	;setup
-	call initDMA
+	call InitializeDMA
 	
 	ei ; enable interrupts 
 
-	jp gameInit
+	jp GameInit
 
 SECTION "MAINLOOP", ROM0  
-gameloop:
+GameLoop:
 
 	; make sure the display is on
 	ld a, [rLCDC]
@@ -101,28 +101,28 @@ gameloop:
 	nop
 	
 	; jump to handler depending on intFlags
-	ld a, [intFlags]
+	ld a, [wInterruptFlags]
 	
 	bit IEF_VBLANK, a ;vblank
-	jp nz, onVBlank
+	jp nz, OnVBlank
 	
 	; some other interrupt happened, just wait for the next
-	jp gameloop
+	jr GameLoop
 
-onVBlank:
+OnVBlank:
 	; reset vblank flag
 	res IEF_VBLANK, a
-	ld [intFlags], a
+	ld [wInterruptFlags], a
 	
-	ld a, [timeFrames]
+	ld a, [wFrames]
 	inc a
-	ld [timeFrames], a
+	ld [wFrames], a
 	
-	ld a, [timeFrameCounter]
+	ld a, [wFrameCounter]
 	inc a
-	ld [timeFrameCounter], a
+	ld [wFrameCounter], a
    
-	jp gameOnVBlank
+	jp GameTick
 	
 include "utils.asm"
 include "data/data.inc"

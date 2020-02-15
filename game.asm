@@ -4,58 +4,58 @@ SECTION	"GAME", ROM0
 SCENE_INTRO EQU 0
 SCENE_MENU EQU 1
 
-gameInit:
+GameInit:
 	; do whatever is required, then jump to 
 	
 	xor a ; load scene 0
-	jp gameOnLoadScene
+	jp GameLoadScene
 
-gameOnLoadScene: ;a is the scenenumber to load
+GameLoadScene: ;a is the scenenumber to load
 
 	cp SCENE_INTRO
-	call z, loadScene0
+	call z, LoadScene0
 	
 	;cp SCENE_MENU
 	;call z, 
 		
-	jp gameloop
+	jp GameLoop
 		
-gameOnVBlank:
+GameTick:
 
-	ld a, [timeFrames]
-	ld [camScrollX], a
+	ld a, [wFrames]
+	ld [wCamScrollX], a
 	
 	; setSprite 0,[timeTickCounter],100,1,0
 	
-	ld a, [currentScene]
+	ld a, [wCurrentScene]
 	cp 0
-	call z, tickIntro
+	call z, TickIntro
 	
-	jp gameloop
+	jp GameLoop
 
 ; =============================
 	
-loadScene0:
+LoadScene0:
 	;load SCENE_INTRO
 	di
-	call turnScreenOffSafe
+	call TurnScreenOff
 
 	ld hl, hello_world_tile_data
 	ld bc, hello_world_tile_data_size
 	ld de, _VRAM ;$8000
-	call memCopy
+	call MemCopy
 	
 	ld hl, hello_world_map_data
 	ld bc, hello_world_tile_map_size
 	ld de, _SCRN0 ;$9800
-	call memCopy
+	call MemCopy
 	
 	ei
 	ret
 
-tickIntro:
+TickIntro:
 
-	ld hl, oamstart
+	ld hl, wOamStart
 	ld b, 40
 .next:
 	xor a
@@ -84,8 +84,8 @@ tickIntro:
 	xor a
 	ld [hli], a
 	
-	ret
-	;jp .done
+	;ret
+	jp .done
 
 .skip:
 	ld a, [hl]

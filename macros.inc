@@ -1,4 +1,4 @@
-setSprite: MACRO ; \1 \2\3\4\5
+set_sprite: MACRO ; \1 \2\3\4\5
 	ld a, \2
 	ld [oamstart + \1*4], a
 	
@@ -12,7 +12,7 @@ setSprite: MACRO ; \1 \2\3\4\5
 	ld [oamstart + 3 + \1*4], a
 ENDM
 
-clearSprite: MACRO ; \1
+clear_sprite: MACRO ; \1
 	xor a
 	ld [oamstart + \1*4], a
 ENDM

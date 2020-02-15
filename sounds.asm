@@ -1,4 +1,4 @@
-soundOff:
+SoundOff:
 	xor a 
     ld [rAUDVOL], a
     ld [rAUDTERM], a
@@ -6,7 +6,7 @@ soundOff:
     
     ret
     
-soundOn:
+SoundOn:
 	ld a, $ff 
     ld [rAUDVOL], a
     ld [rAUDTERM], a

@@ -1,10 +1,10 @@
 SECTION "UTILS", ROM0
 
-turnScreenOffSafe:
+TurnScreenOff:
 	; wait for vblank
 	ld a, [rSTAT]   
 	and STATF_BUSY  
-	jr nz, turnScreenOffSafe
+	jr nz, TurnScreenOff
 
 	; turn it off
 	ld a, [rLCDC]
@@ -16,10 +16,10 @@ turnScreenOffSafe:
 ; HL - memory position of the start of the copying source
 ; DE - memory position of the start of the copying destination
 ; BC - the number of bytes to be copied
-memCopy:
+MemCopy:
     inc b
     inc c
-    jr  .skip
+    jr .skip
 .loop:
     ld a, [hl+]
     ld [de], a
@@ -31,8 +31,8 @@ memCopy:
     jr nz, .loop
     ret
 
-clearAllSprites:
-	ld hl, oamstart
+ClearAllSprites:
+	ld hl, wOamStart
 	ld b, 160
 	xor a
 .loop:
