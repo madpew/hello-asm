@@ -17,6 +17,11 @@ SECTION	"INT_p1thru4",ROM0[$0060]
 
 SECTION "VSYNC", ROM0
 intVBlank:
+
+	push af
+	push bc
+	push hl
+
 	; setup OAM-DMA routine in High Ram
 	ld c, $80
 	ld b, 12
@@ -52,31 +57,37 @@ intVBlank:
 	set IEF_VBLANK, a
 	ld [intFlags], a
 	
+	
+	pop hl
+	pop bc
+	pop af
+	
 	reti
 	
 ; short code fragment that gets loaded into hiram to initiate dma-transfer
 ; $c0 is the location to copy from	
 dmacode:
 	;db	$3e, $c0, $e0, $46, $3e, $28, $3d, $20, $fd, $c9
-	db $f3, $3e, $c0, $e0, $46, $3e, $28, $3d, $20, $fd, $fb, $c9 ;safer version with disabled interrupts
+	db $f3, $3e, $c0, $e0, $46, $3e, $38, $3d, $20, $fd, $fb, $c9 ;safer version with disabled interrupts
+	;extended wait from $28 to $38
 
 SECTION "HSYNC", ROM0
 intLCDC:
 
 	push af
 
+	;check scene
 	;ld a, [currentScene]
 	;cp 0
 	;jp nz, .done
 	
+	ld a, [rLY]
+	cp a, 100
+	jp nc, .done
 	
-	;ld a, [rLY]
-	;cp a, 100
-	;jp nc, .done
-	
-	;ld a, [rOBP0]
-	;xor a, $FF
-	;ld [rOBP0], a
+	ld a, [rOBP0]
+	xor a, $FF
+	ld [rOBP0], a
 	
 .done: 
 	pop af
