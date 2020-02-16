@@ -20,7 +20,8 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "command": "bgb ${cwd}\\*.gb"
+            "command": "bgb ${cwd}\\*.gb",
+            "problemMatcher": []
         }
     ]
 }

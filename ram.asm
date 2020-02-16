@@ -16,6 +16,9 @@ wCurrentScene: ds 1
 wFrames: ds 1
 wFrameCounter: ds 1
 
+wInputState: ds 1
+wInputChanged: ds 1
+
 SECTION "USER MEMORY", WRAM0
 
 wTemp: ds 1

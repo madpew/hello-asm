@@ -45,13 +45,9 @@ BootSequence:
     ld [rLCDC], a
 	
 	; palette setup
-	ld a, [rBGP]
+	ld a, %11100100
 	ld [wPaletteBg], a
-	
-	ld a, [rOBP0]
 	ld [wPaletteObj0], a
-	
-	ld a, [rOBP1]
 	ld [wPaletteObj1], a
 	
 	;setup scroll
@@ -63,7 +59,8 @@ BootSequence:
 	
 	ld [wCurrentScene], a	; start with scene 0
 	ld [wInterruptFlags], a		; reset interrupt flags
-	
+	ld [wInputState], a ; reset input state
+
 	;init sprites
 	call ClearAllSprites
 	
@@ -118,6 +115,8 @@ GameLoop:
 	inc a
 	ld [wFrameCounter], a
    
+	call UpdateInputState
+
 	jp GameTick
 
 include "utils.asm"

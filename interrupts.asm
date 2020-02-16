@@ -103,7 +103,8 @@ InterruptLCDC:
 	cp a, 92+16
 	jr c, .done ; LY < cmp 
 	;LY > 92+16
-	ld a, %01000100
+	ld a, [rOBP0]
+	xor $ff
 	ld [rOBP0], a
 	
 .done: 
