@@ -83,7 +83,6 @@ TickIntro:
 	ld a, [rTIMA]
 	add a, c
 	add a,l
-	sla a
 	ld [hli], a
 
 	ld a, 5 ; O

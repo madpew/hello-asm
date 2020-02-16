@@ -14,31 +14,28 @@ SECTION	"INT_p1thru4",ROM0[$0060]
 	reti
 
 
+SECTION "OAM DMA", HRAM
+hOAMDMA:
+	ds 8
 
 SECTION "VBLANK", ROM0
 
 ; setup OAM-DMA routine in high ram
 InitializeDMA:
-
-	ld c, $80
-	ld b, 10
+	ld bc, (DMACodeEnd - DMACode) << 8 | LOW(hOAMDMA)
 	ld hl, DMACode
 .loop:
 	ld a, [hli]
-	ld [c], a
+	ldh [c], a
 	inc c
 	dec b
 	jr nz, .loop
 	
 	ret
 
-
 DMACode:
-	; $c000 is the location to copy from (shadow oam)
-	
-	ld a, $c0
-	ld [rDMA], a
-	
+	ld a, HIGH(wOamStart)
+	ldh [rDMA], a
 	ld a, 40
 	
 .waitDMA:
@@ -46,6 +43,7 @@ DMACode:
 	jr nz, .waitDMA
 	
 	ret
+DMACodeEnd:
 	
 InterruptVBlank:
 
@@ -54,7 +52,7 @@ InterruptVBlank:
 	push hl
 
 	; dma-update OAM
-	call $ff80
+	call hOAMDMA
 	
 	; update palettes
 	ld a, [wPaletteBg]
