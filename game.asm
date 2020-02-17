@@ -8,7 +8,7 @@ GameInit:
 	; do whatever is required, then jump to 
 	
 	xor a ; load scene 0
-	jp GameLoadScene
+	jr GameLoadScene
 
 GameLoadScene: ;a is the scenenumber to load
 
@@ -17,7 +17,9 @@ GameLoadScene: ;a is the scenenumber to load
 	
 	;cp SCENE_MENU
 	;call z, 
-		
+
+	call TurnScreenOn
+
 	jp GameLoop
 		
 GameTick:
@@ -28,7 +30,7 @@ GameTick:
 	cp 0
 	call z, TickIntro
 	
-	jp GameLoop
+	ret
 
 ; =============================
 	
@@ -37,27 +39,16 @@ LoadScene0:
 	di
 	call TurnScreenOff
 
-	;ld hl, hello_world_tile_data
-	;ld bc, hello_world_tile_data_size
-	;ld de, _VRAM ;$8000
-	;call MemCopy
 	ld hl, concept_tile_data
 	ld bc, concept_tile_data_size
 	ld de, _VRAM ;$8000
 	call MemCopy
 	
-
-	ld de, Menu_map_data
+	ld de, Test2_map_data
 	ld hl, _SCRN0
-	ld bc, BLOCK_SIZE_SCREEN
+	ld bc, Test2_width << 8 | Test2_height
 	call MemCopyBlock
 
-	;ld hl, Menu_map_data
-	;ld bc, Menu_map_data_size
-	;ld de, _SCRN0 ;$9800
-	;call MemCopy
-
-	
 	ei
 	ret
 
@@ -85,7 +76,7 @@ TickIntro:
 	add a,l
 	ld [hli], a
 
-	ld a, 5 ; O
+	ld a, 48 ; rain
 	ld [hli], a
 
 	xor a

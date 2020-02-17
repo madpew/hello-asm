@@ -1,10 +1,14 @@
 include "hardware.inc"
 include "macros.inc"
-;--------------------------------
+
+;--------------------------------------------------------------------------------------------
 
 include "ram.asm"
 include "interrupts.asm"
 
+DEBUG EQU 1
+
+;--------------------------------------------------------------------------------------------
 SECTION	"BOOT", ROM0[$0100]
     nop
     jp	BootSequence
@@ -85,14 +89,11 @@ BootSequence:
 
 	jp GameInit
 
+include "data/data.inc"
+
 SECTION "MAINLOOP", ROM0  
 GameLoop:
 
-	; make sure the display is on
-	ld a, [rLCDC]
-	set 7, a
-	ld [rLCDC], a
-	
 	; wait for next interrupt to occur
 	halt
 	nop
@@ -104,9 +105,30 @@ GameLoop:
 	jr z, GameLoop
 	
 	; reset vblank flag
-	res IEF_VBLANK, a
-	ld [wInterruptFlags], a
+	ld hl, wInterruptFlags
+	res IEF_VBLANK, [hl]
 	
+	
+IF DEBUG
+	;debug length of vsync
+	ld a, [rBGP]
+	xor $ff
+	ld [rBGP], a
+ENDC
+
+	;test updating a whole screen (timing)
+	ld hl, Test2_map_data
+	ld de, _SCRN0
+	ld bc, 32*3
+	call MemCopy
+
+IF DEBUG
+	;debug length of vsync
+	ld a, [rBGP]
+	xor $ff
+	ld [rBGP], a
+ENDC
+
 	ld a, [wFrames]
 	inc a
 	ld [wFrames], a
@@ -117,9 +139,18 @@ GameLoop:
    
 	call UpdateInputState
 
-	jp GameTick
+	call GameTick
+
+IF DEBUG
+	;debug length of vsync
+	ld a, [rBGP]
+	xor $ff
+	ld [rBGP], a
+ENDC
+
+	jp GameLoop
 
 include "utils.asm"
-include "data/data.inc"
+
 include "sounds.asm"
 include "game.asm"

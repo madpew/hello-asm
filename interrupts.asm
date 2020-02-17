@@ -71,9 +71,8 @@ InterruptVBlank:
 	ld [rSCY], a
 	
 	;set vblank flag
-	ld a, [wInterruptFlags]
-	set IEF_VBLANK, a
-	ld [wInterruptFlags], a
+	ld hl, wInterruptFlags
+	set IEF_VBLANK, [hl]
 	
 	pop hl
 	pop bc
@@ -85,26 +84,23 @@ InterruptVBlank:
 
 SECTION "HSYNC", ROM0
 InterruptLCDC:
-
 	push af
 
-	;check scene
-	;ld a, [currentScene]
-	;cp 0
-	;jp nz, .done
-	
 	ld a, [rLY]
-	cp a, 140
-	jr nc, .done ; exit if we're past line 140
-	
-	
-	cp a, 92+16
-	jr c, .done ; LY < cmp 
-	;LY > 92+16
-	ld a, [rOBP0]
-	xor $ff
-	ld [rOBP0], a
-	
+
+	; exit if we're past line 143 to not interfere with vblank
+	cp a, 143
+	jr nc, .done 
+
+	; turn off sprites when drawing the hud
+	cp a, 144-32
+	jr nz, .ignoreSpritesOff
+
+	ld a, [rLCDC]
+	res 1, a
+	ld [rLCDC], a
+.ignoreSpritesOff:
+
 .done: 
 	pop af
 
