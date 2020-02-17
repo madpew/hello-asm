@@ -16,3 +16,7 @@ clear_sprite: MACRO ; \1
 	xor a
 	ld [oamstart + \1*4], a
 ENDM
+
+lb: MACRO ; r, hi, lo
+    ld \1, ((\2) & $ff) << 8 + ((\3) & $ff)
+ENDM

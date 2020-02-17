@@ -1,8 +1,13 @@
 SECTION "LOCAL OAM", WRAM0 [$C000]
-wOamStart: ds 160
+wShadowOam: ds 160
+wShadowMap: ds 1024
+wShadowMapEnd:
 
-SECTION "ENGINE MEMORY", WRAM0 [$C0A0]
+SECTION "ENGINE MEMORY", WRAM0
 wInterruptFlags: ds 1
+
+wShadowMapCopyLine: ds 1
+wShadowMapUpdate: ds 1
 
 wPaletteBg: ds 1
 wPaletteObj0: ds 1

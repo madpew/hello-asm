@@ -18,8 +18,6 @@ GameLoadScene: ;a is the scenenumber to load
 	;cp SCENE_MENU
 	;call z, 
 
-	call TurnScreenOn
-
 	jp GameLoop
 		
 GameTick:
@@ -39,22 +37,31 @@ LoadScene0:
 	di
 	call TurnScreenOff
 
-	ld hl, concept_tile_data
-	ld bc, concept_tile_data_size
+	ld hl, ConceptTileData
+	ld bc, CONCEPT_TILE_LENGTH
 	ld de, _VRAM ;$8000
 	call MemCopy
 	
-	ld de, Test2_map_data
-	ld hl, _SCRN0
-	ld bc, Test2_width << 8 | Test2_height
+	ld de, IntroMapData
+	ld hl, wShadowMap
+	ld bc, INTRO_MAP_SIZE ;Test2_width << 8 | Test2_height
 	call MemCopyBlock
 
+	ld a, $ff
+	ld [wShadowMapUpdate], a
+
+	call TurnScreenOn
 	ei
 	ret
 
 TickIntro:
 
-	ld hl, wOamStart
+	; RAIN (just a simple test effect to have objects around while testing)
+	; fills up unused sprites with raindrops that get moved to the bottom of the screen (and reset)
+	; todo: fix bug, make sure it doesn't scroll other (non rain) sprites
+	; note: for real rain, make the y-limit dynamic (random) and add splashes on removal to simulate them hitting the floor
+
+	ld hl, wShadowOam
 	ld b, 40
 .next:
 	xor a
@@ -76,7 +83,7 @@ TickIntro:
 	add a,l
 	ld [hli], a
 
-	ld a, 48 ; rain
+	ld a, 48 ; raindrop sprite
 	ld [hli], a
 
 	xor a
@@ -88,8 +95,12 @@ TickIntro:
 	ld a, [hl]
 	inc a 
 	inc a
+	inc a
+	inc a
 	ld [hli], a
-	ld a, [hli]
+	ld a, [hl]
+	inc a
+	ld [hli], a
 	ld a, [hli]
 	ld a, [hli]
 .done:	
@@ -97,6 +108,7 @@ TickIntro:
 	jr nz, .next
 .spriteMoveDone:
 
+	; A - flip palette
 	ld b, KEY_A
 	call CheckKeyPressed
 	jr z, .noFlash
@@ -107,6 +119,7 @@ TickIntro:
 
 .noFlash:
 
+	; LEFT - scroll background
 	ld b, KEY_LEFT
 	call CheckKeyHeld
 	jr z, .noScrollLeft
@@ -115,6 +128,7 @@ TickIntro:
 	ld [wCamScrollX], a
 .noScrollLeft:
 
+	; RIGHT - scroll background
 	ld b, KEY_RIGHT
 	call CheckKeyHeld
 	jr z, .noScrollRight
@@ -123,6 +137,7 @@ TickIntro:
 	ld [wCamScrollX], a
 .noScrollRight:
 
+	; UP - scroll background
 	ld b, KEY_UP
 	call CheckKeyHeld
 	jr z, .noScrollUp
@@ -131,6 +146,7 @@ TickIntro:
 	ld [wCamScrollY], a
 .noScrollUp:
 
+	; DOWN - scroll background
 	ld b, KEY_DOWN
 	call CheckKeyHeld
 	jr z, .noScrollDown
@@ -138,5 +154,77 @@ TickIntro:
 	inc a
 	ld [wCamScrollY], a
 .noScrollDown:
+
+	; START - copy map data to shadow map, set flagToUpdate
+	ld b, KEY_START
+	call CheckKeyHeld
+	jr z, .noUpdateShadowMap
+	ld de, WildernessMapData
+	ld hl, wShadowMap
+	ld bc, WILDERNESS_MAP_SIZE
+	call MemCopyBlock
+	ld a, $ff
+	ld [wShadowMapUpdate], a
+.noUpdateShadowMap:
+
+	; B - spawn a mouse at a random location
+	ld b, KEY_B
+	call CheckKeyPressed
+	jr z, .noSpawn
+
+	ld a, [rDIV]
+	ld hl, wShadowMap
+	ld b, 0
+	ld c, a
+	add hl, bc
+	
+	ld a, 46 ; mouse
+	ld [hl], a
+
+	ld a, $ff
+	ld [wShadowMapUpdate], a
+.noSpawn:
+
+	; test bg animation
+
+	;GrassTile Indices 0 / 18 
+	ld a, [wFrames]
+	and %00001111 ; animation divider, careful not to sync with shadow-map copy interval or animation will not be visible
+	jr nz, .noAnimation
+
+	ld hl, wShadowMap
+	ld bc, 1024
+	inc b
+    inc c
+	dec hl
+	jr .checkNext
+.animate:
+	ld a, [hl]
+	and $ff
+	jr nz, .check18
+	; it's 0, replace with 18
+	ld a, 18
+	ld [hl], a
+	jr .checkNext
+.check18	
+	cp a, 18
+	jr nz, .checkNext
+
+	ld a, 0
+	ld [hl], a
+
+.checkNext:	
+	inc hl
+	dec c
+	jr nz, .animate
+	dec b
+	jr nz, .animate
+.animationDone:
+	ld a, $ff
+	ld [wShadowMapUpdate], a
+.noAnimation:
+
+
+
 
 	ret

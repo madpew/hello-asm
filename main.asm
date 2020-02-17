@@ -6,7 +6,7 @@ include "macros.inc"
 include "ram.asm"
 include "interrupts.asm"
 
-DEBUG EQU 1
+DEBUG EQU 0
 
 ;--------------------------------------------------------------------------------------------
 SECTION	"BOOT", ROM0[$0100]
@@ -65,6 +65,9 @@ BootSequence:
 	ld [wInterruptFlags], a		; reset interrupt flags
 	ld [wInputState], a ; reset input state
 
+	ld [wShadowMapUpdate], a
+	ld [wShadowMapCopyLine], a
+
 	;init sprites
 	call ClearAllSprites
 	
@@ -110,24 +113,16 @@ GameLoop:
 	
 	
 IF DEBUG
-	;debug length of vsync
+	;debug start of gamecode (turns palette black)
 	ld a, [rBGP]
 	xor $ff
 	ld [rBGP], a
 ENDC
-
-	;test updating a whole screen (timing)
-	ld hl, Test2_map_data
-	ld de, _SCRN0
-	ld bc, 32*3
-	call MemCopy
-
-IF DEBUG
-	;debug length of vsync
-	ld a, [rBGP]
-	xor $ff
-	ld [rBGP], a
-ENDC
+	
+	;re-enable sprites (after turning them off in hblank for the HUD)
+	ld a, [rLCDC]
+	set 1, a
+	ld [rLCDC], a
 
 	ld a, [wFrames]
 	inc a
@@ -142,7 +137,7 @@ ENDC
 	call GameTick
 
 IF DEBUG
-	;debug length of vsync
+	;debug length of gamecode (turn palette back to normal)
 	ld a, [rBGP]
 	xor $ff
 	ld [rBGP], a
@@ -151,6 +146,5 @@ ENDC
 	jp GameLoop
 
 include "utils.asm"
-
 include "sounds.asm"
 include "game.asm"

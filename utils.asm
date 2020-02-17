@@ -64,7 +64,7 @@ MemSet:
     ret
 
 ClearAllSprites:
-	ld hl, wOamStart
+	ld hl, wShadowOam
 	ld b, 160
 	xor a
 .loop:
