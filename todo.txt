@@ -1,5 +1,4 @@
 open tasks:
-- test window-split (by moving WX > 166 during hblanks)
 - implement sound fx
 - implement menu / cursor functionality
 - implement music
@@ -7,3 +6,4 @@ open tasks:
 later:
 - look into meta-tiles, meta-maps etc.
 - look into 4bit packing (like I used in the GBDK version of PSS)
+- come up with a game idea

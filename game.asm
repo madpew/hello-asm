@@ -42,11 +42,23 @@ LoadScene0:
 	ld de, _VRAM ;$8000
 	call MemCopy
 
-	;load window content
-	ld de, GardenMapData
+	; load window tiles
+	ld hl, WindowTileData
+	ld bc, WINDOW_TILE_LENGTH
+	;don't reset de, as it still points to the next tile location
+	call MemCopy
+
+	; load window content
+	ld de, CatTalkMapData
 	ld hl, _SCRN1
-	lb bc, 20, 3
+	ld bc, CATTALK_MAP_SIZE
 	call MemCopyBlock
+
+	;fix block
+	ld e, CONCEPT_TILE_COUNT
+	ld hl, _SCRN1
+	ld bc, 32*3
+	call MemFixOffset
 
 	ld de, IntroMapData
 	ld hl, wShadowMap
@@ -206,7 +218,7 @@ TickIntro:
 	ld a, 7
 	ld [rWX], a
 
-	ld a, 144-24
+	ld a, 0;144-24
 	ld [rWY], a
 
 	ld a, [rLCDC]

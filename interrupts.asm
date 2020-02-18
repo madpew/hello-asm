@@ -152,6 +152,22 @@ InterruptLCDC:
 	cp a, 144
 	jr nc, .done 
 
+	; on line 12, turn off the window to split it
+	cp a, 12
+	jr nz, .skipWindowOff
+	ld a, 167
+	ld [rWX], a
+	ld a, [rLY]
+.skipWindowOff:
+
+	; if line 144-12 turn window on
+	cp a, 144-12
+	jr nz, .skipWindowOn
+	ld a, 7
+	ld [rWX], a
+	ld a, [rLY]
+.skipWindowOn:
+
 	; turn off sprites when drawing the hud
 	cp a, 144-32
 	jr nz, .ignoreSpritesOff

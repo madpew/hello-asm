@@ -127,6 +127,26 @@ MemSet:
 
     ret
 
+; E - offset
+; HL - start
+; BC - len
+MemFixOffset:
+    inc b
+    inc c
+    jr .skip
+
+.loop:
+    ld a, [hl]
+    add a, e
+    ld [hli], a 
+.skip:
+    dec c
+    jr nz, .loop
+    dec b
+    jr nz, .loop
+
+    ret
+
 ClearAllSprites:
 	ld hl, wShadowOam
 	ld b, 160
