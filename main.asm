@@ -82,7 +82,7 @@ BootSequence:
 	ld [rIE], a
 	
 	; turn on screen
-	ld a, LCDCF_OFF | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON 
+	ld a, LCDCF_OFF | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_WIN9C00 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON 
 	ld [rLCDC], a
 	
 	;setup
@@ -120,9 +120,10 @@ IF DEBUG
 ENDC
 	
 	;re-enable sprites (after turning them off in hblank for the HUD)
-	ld a, [rLCDC]
-	set 1, a
-	ld [rLCDC], a
+	;ld a, [rLCDC]
+	;set 1, a
+	;ld [rLCDC], a
+	; it's now done in the hblank interrupt
 
 	ld a, [wFrames]
 	inc a

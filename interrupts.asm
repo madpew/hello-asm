@@ -138,20 +138,33 @@ SECTION "HSYNC", ROM0
 InterruptLCDC:
 	push af
 	ld a, [rLY]
+	and a
+	jr nz, .notFirstLine
 
+	;line 0, turn on sprites again
+	ld a, [rLCDC]
+	set 1, a
+	ld [rLCDC], a
+
+	ld a, [rLY]
+.notFirstLine:
 	; exit if we're past line 143 to not interfere with vblank
-	cp a, 143
+	cp a, 144
 	jr nc, .done 
 
 	; turn off sprites when drawing the hud
-	;cp a, 144-32
-	;jr nz, .ignoreSpritesOff
+	cp a, 144-32
+	jr nz, .ignoreSpritesOff
 
-	;ld a, [rLCDC]
-	;res 1, a
-	;ld [rLCDC], a
+	ld a, [rLCDC]
+	and LCDCF_WINON
+	jr z, .ignoreSpritesOff
 
-;.ignoreSpritesOff:
+	ld a, [rLCDC]
+	res 1, a
+	ld [rLCDC], a
+
+.ignoreSpritesOff:
 
 .done: 
 	pop af

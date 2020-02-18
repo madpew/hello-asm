@@ -1,31 +1,95 @@
 SECTION "UTILS", ROM0
 
+WaitVRam:
+	ldh a, [rSTAT]   
+	and STATF_BUSY  
+	jr nz, WaitVRam
+
+    ret
+
 TurnScreenOff:
 	; wait for vblank
-	ld a, [rSTAT]   
+	ldh a, [rSTAT]   
 	and STATF_BUSY  
 	jr nz, TurnScreenOff
 
 	; turn it off
-	ld a, [rLCDC]
+	ldh a, [rLCDC]
 	res 7, a
-	ld [rLCDC], a
+	ldh [rLCDC], a
 	
 	ret
 
 
 TurnScreenOn:
 	; wait for vblank
-	ld a, [rSTAT]   
+	ldh a, [rSTAT]   
 	and STATF_BUSY  
 	jr nz, TurnScreenOn
 
 	; turn it on
-	ld a, [rLCDC]
+	ldh a, [rLCDC]
 	set 7, a
-	ld [rLCDC], a
+	ldh [rLCDC], a
 	
 	ret
+
+; HL - source address of tile
+; DE - destination address of tile
+; B - tile count (max 16)
+UpdateTilesHBlank:
+
+.doUpdate:
+sla b ;2
+sla b ;4
+sla b ;8
+sla b ;16
+
+.waitVRAMReady:
+    ldh a, [rSTAT]
+    and STATF_BUSY
+    jr nz, .waitVRAMReady
+
+    ld a, [hli]
+    ld [de], a
+    inc de
+    dec b
+    jr nz, .doUpdate
+
+    ret 
+
+; HL - start address of the tile
+ScrollTileRightHBlank:
+    ld b, 16
+.doUpdate:
+.waitVRAMReady:
+    ldh a, [rSTAT]
+    and STATF_BUSY
+    jr nz, .waitVRAMReady
+
+    rrc [hl]
+    inc hl
+    dec b
+    jr nz, .doUpdate
+
+    ret 
+
+; HL - start address of the tile
+ScrollTileLeftHBlank:
+    ld b, 16
+.doUpdate:
+.waitVRAMReady:
+    ldh a, [rSTAT]
+    and STATF_BUSY
+    jr nz, .waitVRAMReady
+
+    rlc [hl]
+    inc hl
+    dec b
+    jr nz, .doUpdate
+
+    ret 
+
 
 ; HL - memory position of the start of the copying source
 ; DE - memory position of the start of the copying destination

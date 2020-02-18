@@ -1,11 +1,9 @@
 open tasks:
-- test background-map animations (loop through map and change tiles) if too slow, only update visible part of the background
-- test window or background-map switch _SCRN0, _SCRN1
+- test window-split (by moving WX > 166 during hblanks)
 - implement sound fx
 - implement menu / cursor functionality
 - implement music
 
 later:
-- implement vsync overlap check (check if vsync happens while still in vsync code)
 - look into meta-tiles, meta-maps etc.
 - look into 4bit packing (like I used in the GBDK version of PSS)

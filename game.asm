@@ -41,7 +41,13 @@ LoadScene0:
 	ld bc, CONCEPT_TILE_LENGTH
 	ld de, _VRAM ;$8000
 	call MemCopy
-	
+
+	;load window content
+	ld de, GardenMapData
+	ld hl, _SCRN1
+	lb bc, 20, 3
+	call MemCopyBlock
+
 	ld de, IntroMapData
 	ld hl, wShadowMap
 	ld bc, INTRO_MAP_SIZE ;Test2_width << 8 | Test2_height
@@ -185,11 +191,40 @@ TickIntro:
 	ld [wShadowMapUpdate], a
 .noSpawn:
 
+
+	; SELECT - Toggle Window
+	ld b, KEY_SELECT
+	call CheckKeyPressed
+	jr z, .noToggleWindow
+
+	ld a, [rLCDC]
+	and LCDCF_WINON
+	jr nz, .turnOffWindow
+
+	; window setup could be made during init
+	; also it might be a good idea to animate the window scrolling in from the bottom?
+	ld a, 7
+	ld [rWX], a
+
+	ld a, 144-24
+	ld [rWY], a
+
+	ld a, [rLCDC]
+	or LCDCF_WINON
+	ld [rLCDC], a
+
+	jr .noToggleWindow
+.turnOffWindow:	
+	ld a, [rLCDC]
+	res 5, a
+	ld [rLCDC], a
+.noToggleWindow:
+
 	; test bg animation
 
 	;GrassTile Indices 0 / 18 
 	ld a, [wFrames]
-	and %00001111 ; animation divider, careful not to sync with shadow-map copy interval or animation will not be visible
+	and $0f ; animation divider, careful not to sync with shadow-map copy interval or animation will not be visible (more than 16)
 	jr nz, .noAnimation
 
 	ld hl, wShadowMap
@@ -225,6 +260,10 @@ TickIntro:
 .noAnimation:
 
 
+	ld hl, _VRAM + 40*16
+	call ScrollTileLeftHBlank
 
+	ld hl, _VRAM + 5*16
+	call ScrollTileRightHBlank
 
 	ret
