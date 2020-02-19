@@ -29,6 +29,8 @@ dw	TickHelp
 
 GameInit:
 	; do whatever setup is required, then load first scene
+	call SoundOn
+
 	xor a
 	call GameLoadScene
 	jp GameLoop

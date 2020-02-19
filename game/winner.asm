@@ -1,5 +1,4 @@
 ; entry point to load this scene
-; needs to jump back to GameLoop
 LoadWinner:
     ;update map
 	;load_shadow_map winnerdata, winnersize
@@ -7,7 +6,6 @@ LoadWinner:
 	ret
 
 ; entry point each frame
-; needs to jump back to GameTickDone
 ; do vblank stuff first
 TickWinner:
 

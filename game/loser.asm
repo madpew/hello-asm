@@ -1,5 +1,4 @@
 ; entry point to load this scene
-; needs to jump back to GameLoop
 LoadLoser:
     ;update map
 	;load_shadow_map loserdata, losersize
@@ -7,7 +6,6 @@ LoadLoser:
 	ret
 
 ; entry point each frame
-; needs to jump back to GameTickDone
 ; do vblank stuff first
 TickLoser:
 

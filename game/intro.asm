@@ -6,7 +6,7 @@ LoadIntro:
 
 	ld hl, WindowTileData
 	ld bc, WINDOW_TILE_LENGTH
-	ld de, _VRAM ;$8000
+	ld de, _VRAM
 	call MemCopy
 
 	load_shadow_map CatIntroMapData, CATINTRO_MAP_SIZE
@@ -22,7 +22,8 @@ TickIntro:
 	; START the game
 	is_key_pressed KEY_START
 	jr z, .noSwitchGame
-	switch_scene SCENE_GAME
+	;switch_scene SCENE_GAME
+	call SoundTest ;test sound
 	ret
 .noSwitchGame:
 

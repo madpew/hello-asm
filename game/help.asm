@@ -1,5 +1,4 @@
 ; entry point to load this scene
-; needs to jump back to GameLoop
 LoadHelp:
 	
 	load_shadow_map CatTutorialMapData, CATTUTORIAL_MAP_SIZE
@@ -7,7 +6,6 @@ LoadHelp:
 	ret
 
 ; entry point each frame
-; needs to jump back to GameTickDone
 ; do vblank stuff first
 TickHelp:
 
