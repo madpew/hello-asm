@@ -20,3 +20,29 @@ ENDM
 lb: MACRO ; r, hi, lo
     ld \1, ((\2) & $ff) << 8 + ((\3) & $ff)
 ENDM
+
+is_key_pressed : MACRO	; \1 = KEYCODE
+    ld a, [wInputState]
+    and \1
+    ld b, a
+    ld a, [wInputChanged]
+    and b
+    ENDM
+
+is_key_held : MACRO		; \1 = KEYCODE
+	ld a, [wInputState]
+    and \1
+    ENDM
+
+switch_scene : MACRO	; \1 = SCENE_ constant
+	ld a, \1
+    call GameLoadScene
+    ENDM
+
+load_shadow_map : MACRO	; \1 = data, \2 = size
+	ld de, \1
+	ld hl, wShadowMap
+	ld bc, \2
+	call MemCopyBlock
+	call QueueShadowUpdate
+    ENDM

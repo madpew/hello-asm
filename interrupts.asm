@@ -111,19 +111,19 @@ InterruptVBlank:
 
 	; update palettes
 	ld a, [wPaletteBg]
-	ld [rBGP], a
+	ldh [rBGP], a
 	
 	ld a, [wPaletteObj0]
-	ld [rOBP0], a
+	ldh [rOBP0], a
 	
 	ld a, [wPaletteObj1]
-	ld [rOBP1], a
+	ldh [rOBP1], a
 	
 	; reset/update scroll
 	ld a, [wCamScrollX]
-	ld [rSCX], a
+	ldh [rSCX], a
 	ld a, [wCamScrollY]
-	ld [rSCY], a
+	ldh [rSCY], a
 	
 	;set vblank flag
 	ld hl, wInterruptFlags
@@ -136,53 +136,60 @@ InterruptVBlank:
 	
 SECTION "HSYNC", ROM0
 InterruptLCDC:
+	reti
 	push af
-	ld a, [rLY]
-	and a
-	jr nz, .notFirstLine
 
-	;line 0, turn on sprites again
-	ld a, [rLCDC]
-	set 1, a
-	ld [rLCDC], a
+	;ld a, [wLFSR]
+	;call GetNextRandom
+	;and a, %00000001
+	;ldh [rSCX], a
+	
 
-	ld a, [rLY]
-.notFirstLine:
+	ldh a, [rLY]
+
 	; exit if we're past line 143 to not interfere with vblank
-	cp a, 144
-	jr nc, .done 
+	cp a, 143
+	
+;line 0, turn on sprites again
+	jr nz, .notFirstLine
+	ldh a, [rSCX]
+	ld [wCamScrollX], a
+	ldh a, [rLCDC]
+	set 1, a
+	ldh [rLCDC], a
+	jr .done
+.notFirstLine:
+	;jr nc, .done 
 
 	; on line 12, turn off the window to split it
 	cp a, 12
 	jr nz, .skipWindowOff
 	ld a, 167
-	ld [rWX], a
-	ld a, [rLY]
+	ldh [rWX], a
+	jr .done
 .skipWindowOff:
 
 	; if line 144-12 turn window on
 	cp a, 144-12
 	jr nz, .skipWindowOn
 	ld a, 7
-	ld [rWX], a
-	ld a, [rLY]
+	ldh [rWX], a
+	jr .done
 .skipWindowOn:
 
 	; turn off sprites when drawing the hud
 	cp a, 144-32
 	jr nz, .ignoreSpritesOff
 
-	ld a, [rLCDC]
-	and LCDCF_WINON
+	ldh a, [rLCDC]
+	bit 5, a
 	jr z, .ignoreSpritesOff
-
-	ld a, [rLCDC]
 	res 1, a
-	ld [rLCDC], a
-
+	ldh [rLCDC], a
 .ignoreSpritesOff:
 
 .done: 
+
 	pop af
 
 	reti

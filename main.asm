@@ -46,7 +46,7 @@ BootSequence:
 	; shut down screen
     call TurnScreenOff
 	xor a
-    ld [rLCDC], a
+    ldh [rLCDC], a
 	
 	; palette setup
 	ld a, %11100100
@@ -54,10 +54,12 @@ BootSequence:
 	ld [wPaletteObj0], a
 	ld [wPaletteObj1], a
 	
+	ld [wLFSR], a
+
 	;setup scroll
 	xor a
-	ld [rSCX], a
-	ld [rSCY], a
+	ldh [rSCX], a
+	ldh [rSCY], a
 	ld [wCamScrollX], a
 	ld [wCamScrollY], a
 	
@@ -75,15 +77,18 @@ BootSequence:
 	;seta [rTMA], 190 ;~60 fps
 	;seta [rTAC], TACF_START | TACF_4KHZ
 	
-	ld a, %00001000
-	ld [rSTAT], a
+	ld a, STATF_LYC ; | STATF_MODE00
+	ldh [rSTAT], a
+
+	xor a
+	ldh [rLYC], a
 	
 	ld a, IEF_VBLANK | IEF_LCDC
-	ld [rIE], a
+	ldh [rIE], a
 	
 	; turn on screen
 	ld a, LCDCF_OFF | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_WIN9C00 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON 
-	ld [rLCDC], a
+	ldh [rLCDC], a
 	
 	;setup
 	call InitializeDMA
@@ -101,30 +106,17 @@ GameLoop:
 	halt
 	nop
 	
-	; jump to handler depending on intFlags
 	ld a, [wInterruptFlags]
-	
-	bit IEF_VBLANK, a ;vblank
+	bit IEF_VBLANK, a ; check if we had an vblank
 	jr z, GameLoop
-	
-	; reset vblank flag
-	ld hl, wInterruptFlags
-	res IEF_VBLANK, [hl]
-	
 	
 IF DEBUG
 	;debug start of gamecode (turns palette black)
-	ld a, [rBGP]
+	ldh a, [rBGP]
 	xor $ff
-	ld [rBGP], a
+	ldh [rBGP], a
 ENDC
 	
-	;re-enable sprites (after turning them off in hblank for the HUD)
-	;ld a, [rLCDC]
-	;set 1, a
-	;ld [rLCDC], a
-	; it's now done in the hblank interrupt
-
 	ld a, [wFrames]
 	inc a
 	ld [wFrames], a
@@ -139,10 +131,14 @@ ENDC
 
 IF DEBUG
 	;debug length of gamecode (turn palette back to normal)
-	ld a, [rBGP]
+	ldh a, [rBGP]
 	xor $ff
-	ld [rBGP], a
+	ldh [rBGP], a
 ENDC
+
+	ld a, [wInterruptFlags]
+	res IEF_VBLANK, a	; reset vblank flag
+	ld [wInterruptFlags], a
 
 	jp GameLoop
 

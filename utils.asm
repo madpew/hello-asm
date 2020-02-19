@@ -61,6 +61,10 @@ sla b ;16
 ; HL - start address of the tile
 ScrollTileRightHBlank:
     ld b, 16
+.waitVRAMBusy:
+    ldh a, [rSTAT]
+    and STATF_BUSY
+    jr z, .waitVRAMBusy
 .doUpdate:
 .waitVRAMReady:
     ldh a, [rSTAT]
@@ -175,24 +179,24 @@ UpdateInputState:
     
     ; Read D-pad
 	ld a, $20
-    ld [_HW], a 
+    ldh [_HW], a 
 
-    ld a, [_HW]
-    ld a, [_HW]
+    ldh a, [_HW]
+    ldh a, [_HW]
     cpl
     and $0f
     ld b, a 
     
     ; Read buttons (Start, Select, B, A)
     ld a, $10
-    ld [_HW], a 
+    ldh [_HW], a 
 
-    ld a, [_HW]
-    ld a, [_HW]
-    ld a, [_HW]
-    ld a, [_HW]
-    ld a, [_HW]
-    ld a, [_HW]
+    ldh a, [_HW]
+    ldh a, [_HW]
+    ldh a, [_HW]
+    ldh a, [_HW]
+    ldh a, [_HW]
+    ldh a, [_HW]
 
     cpl
     and $0f
@@ -203,7 +207,7 @@ UpdateInputState:
     ld b, a 
     
     ld a, $30
-    ld [_HW], a
+    ldh [_HW], a
     
     ;b contains current inputstate
     ld a, [wInputState]
@@ -215,22 +219,6 @@ UpdateInputState:
     pop bc 
     pop af
 
-    ret
-
-;check if a key changed and is now active
-; B - key
-CheckKeyPressed:
-    ld a, [wInputState]
-    and b
-    ld b, a
-    ld a, [wInputChanged]
-    and b
-    ret
-
-; B - key
-CheckKeyHeld:
-    ld a, [wInputState]
-    and b
     ret
 
 ; setMetatile sets 16x16 pixels in the background by using a 4 byte-lookuptable
@@ -365,3 +353,36 @@ MemCopyBlock:
     pop af
 
     ret
+
+QueueShadowUpdate:
+    xor a
+    ld [wShadowMapCopyLine], a
+    xor $ff
+    ld [wShadowMapUpdate], a
+
+    ret
+
+; GetNextRandom
+; returns A - value of the 8bit Linear Feedback Shift Register, to see write a value that is not 0 to wLFSR
+GetNextRandom:
+	ld a, [wLFSR]
+	rlc a   ;do shift first
+	jr nc, .noXor
+	xor %00011100
+.noXor:
+	ld [wLFSR], a
+	ret
+
+;GetNextRandom:
+;    push bc
+;	ld a, [wLFSR]
+;	ld b, a
+;	and a, %10000000
+;	jr z, .doShift
+;	ld a, b
+;	xor %00001110
+;.doShift:
+;	rlc a
+;   pop bc
+;	ld [wLFSR], a
+;	ret

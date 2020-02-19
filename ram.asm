@@ -24,6 +24,8 @@ wFrameCounter: ds 1
 wInputState: ds 1
 wInputChanged: ds 1
 
+wLFSR: ds 1
+
 SECTION "USER MEMORY", WRAM0
 
 wTemp: ds 1

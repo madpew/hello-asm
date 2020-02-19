@@ -1,15 +1,15 @@
 SoundOff:
 	xor a 
-    ld [rAUDVOL], a
-    ld [rAUDTERM], a
-    ld [rAUDENA], a
+    ldh [rAUDVOL], a
+    ldh [rAUDTERM], a
+    ldh [rAUDENA], a
     
     ret
     
 SoundOn:
 	ld a, $ff 
-    ld [rAUDVOL], a
-    ld [rAUDTERM], a
-    ld [rAUDENA], a
+    ldh [rAUDVOL], a
+    ldh [rAUDTERM], a
+    ldh [rAUDENA], a
     
     ret

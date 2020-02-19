@@ -6,4 +6,32 @@ open tasks:
 later:
 - look into meta-tiles, meta-maps etc.
 - look into 4bit packing (like I used in the GBDK version of PSS)
-- come up with a game idea
+- optimize functions calls by using RST Vectors: eg. put "jp hl" at offset $8 and  use "rst $8" instead of "call _hl"
+
+
+
+Rework Game.asm to use jump tables + call, so Load can RET, which should solve the call load in tick problem.
+
+FuncTableLoad:
+dw	LoadIntro
+dw	LoadFight
+dw	LoadWinner
+dw	LoadLoser
+dw	LoadHelp
+
+FuncTableTick:
+dw	TickIntro
+dw	TickFight
+dw	TickWinner
+dw	TickLoser
+dw	TickHelp
+
+
+    _hl:
+        jp hl
+=====
+    ld bc, [wCurrentScene]
+    ld hl, JumpTable
+    add hl, bc
+
+    call _hl
