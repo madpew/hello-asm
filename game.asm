@@ -13,60 +13,47 @@ include "game/winner.asm"
 include "game/loser.asm"
 include "game/help.asm"
 
+FuncTableLoad:
+dw	LoadIntro
+dw	LoadFight
+dw	LoadWinner
+dw	LoadLoser
+dw	LoadHelp
+
+FuncTableTick:
+dw	TickIntro
+dw	TickFight
+dw	TickWinner
+dw	TickLoser
+dw	TickHelp
+
 GameInit:
 	; do whatever setup is required, then load first scene
 	xor a
 	call GameLoadScene
 	jp GameLoop
 
-GameLoadScene: ;A is the scenenumber to load
+; @param a Contains the scene number to load. (SCENE enum)
+GameLoadScene: 
 
-	ld b, a
-
-	; update current scene
-	ld [wCurrentScene], a
-	; reset counter
+	ld [wCurrentScene], a		; safe current scene number
+	ld c, a						; copy over to c, as "lookupJump" requires the offset in BC
+	sla c						; shift c left (*2) because our table contains 16bit addresses
+	
 	xor a
-	ld [wFrameCounter], a
+	ld [wFrameCounter], a		; reset frame counter to 0
+	ld b, a						; set b (upper part of jump offset) to 0 as well
 
-	ld a, b
-
-	cp SCENE_INTRO
-	jp z, LoadIntro
-	
-	cp SCENE_GAME
-	jp z, LoadFight
-	
-	cp SCENE_WIN
-	jp z, LoadWinner
-	
-	cp SCENE_LOST
-	jp z, LoadLoser
-
-	cp SCENE_HELP
-	jp z, LoadHelp
-
-	stop ;should never reach this
+	lookup_jump FuncTableLoad	; do the table jump using the given Table (label) and offset stored in BC
 		
 GameTick:
 	
 	;do global stuff here (update music maybe?)
-
+	
 	;branch out according to scene
 	ld a, [wCurrentScene]
-	cp SCENE_INTRO
-	jp z, TickIntro
+	sla a
+	ld b, 0
+	ld c, a
 	
-	cp SCENE_GAME
-	jp z, TickFight
-	
-	cp SCENE_WIN
-	jp z, TickWinner
-	
-	cp SCENE_LOST
-	jp z, TickLoser	
-
-	cp SCENE_HELP
-	jp z, TickHelp
-
-	stop ;should never reach this
+	lookup_jump FuncTableTick

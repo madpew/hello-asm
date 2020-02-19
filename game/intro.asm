@@ -1,5 +1,4 @@
 ; entry point to load this scene
-; needs to jump back to GameLoop
 LoadIntro:
 
 	di
@@ -17,7 +16,6 @@ LoadIntro:
 	ret
 
 ; entry point each frame
-; needs to jump back to GameTickDone
 ; do vblank stuff first
 TickIntro:
 
@@ -63,8 +61,8 @@ AnimateMap:
 	and $0f ; animation speed divider, careful not to sync with shadow-map copy interval or animation will not be visible (more than 16)
 	jr nz, .noAnimation
 
-	ld hl, wShadowMap
-	ld bc, 1024
+	ld hl, wShadowMap + 32*12
+	ld bc, 20
 	inc b
     inc c
 	dec hl

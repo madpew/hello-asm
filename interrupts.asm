@@ -22,7 +22,7 @@ SECTION "VBLANK", ROM0
 
 ; setup OAM-DMA routine in high ram
 InitializeDMA:
-	lb bc, DMACodeEnd - DMACode, LOW(hOAMDMA)	;= ld bc, (DMACodeEnd - DMACode) << 8 | LOW(hOAMDMA)
+	ld16 bc, DMACodeEnd - DMACode, LOW(hOAMDMA)	;= ld bc, (DMACodeEnd - DMACode) << 8 | LOW(hOAMDMA)
 	ld hl, DMACode
 .loop:
 	ld a, [hli]
@@ -45,7 +45,7 @@ DMACode:
 	ret
 DMACodeEnd:
 
-SHADOWMAP_CHUNKS EQU 32
+SHADOWMAP_CHUNKS EQU 16
 SHADOWMAP_CHUNK_SIZE EQU 64
 
 InterruptVBlank:
@@ -58,7 +58,7 @@ InterruptVBlank:
 	
 	; copy shadow-map to map
 	ld a, [wShadowMapUpdate]
-	and $ff
+	and a
 	jr z, .shadowMapUpdateDone
 
 	push bc
@@ -99,7 +99,7 @@ InterruptVBlank:
 	pop bc
 
 	;check if we're done
-	cp a, (SHADOWMAP_CHUNKS*32/SHADOWMAP_CHUNK_SIZE)
+	cp SHADOWMAP_CHUNKS
 	jr nz, .shadowMapUpdateDone
 
 	;finished, set update and line to 0	
@@ -136,59 +136,7 @@ InterruptVBlank:
 	
 SECTION "HSYNC", ROM0
 InterruptLCDC:
-	reti
 	push af
-
-	;ld a, [wLFSR]
-	;call GetNextRandom
-	;and a, %00000001
-	;ldh [rSCX], a
-	
-
-	ldh a, [rLY]
-
-	; exit if we're past line 143 to not interfere with vblank
-	cp a, 143
-	
-;line 0, turn on sprites again
-	jr nz, .notFirstLine
-	ldh a, [rSCX]
-	ld [wCamScrollX], a
-	ldh a, [rLCDC]
-	set 1, a
-	ldh [rLCDC], a
-	jr .done
-.notFirstLine:
-	;jr nc, .done 
-
-	; on line 12, turn off the window to split it
-	cp a, 12
-	jr nz, .skipWindowOff
-	ld a, 167
-	ldh [rWX], a
-	jr .done
-.skipWindowOff:
-
-	; if line 144-12 turn window on
-	cp a, 144-12
-	jr nz, .skipWindowOn
-	ld a, 7
-	ldh [rWX], a
-	jr .done
-.skipWindowOn:
-
-	; turn off sprites when drawing the hud
-	cp a, 144-32
-	jr nz, .ignoreSpritesOff
-
-	ldh a, [rLCDC]
-	bit 5, a
-	jr z, .ignoreSpritesOff
-	res 1, a
-	ldh [rLCDC], a
-.ignoreSpritesOff:
-
-.done: 
 
 	pop af
 

@@ -170,3 +170,57 @@ DoRainFx:
 	res 5, a
 	ldh [rLCDC], a
 .noToggleWindow:
+
+
+hblank:
+	;ld a, [wLFSR]
+	;call GetNextRandom
+	;and a, %00000001
+	;ldh [rSCX], a
+	
+
+	ldh a, [rLY]
+
+	; exit if we're past line 143 to not interfere with vblank
+	cp a, 143
+	
+;line 0, turn on sprites again
+	jr nz, .notFirstLine
+	ldh a, [rSCX]
+	ld [wCamScrollX], a
+	
+	ldh a, [rLCDC]
+	set 1, a
+	ldh [rLCDC], a
+
+	jr .done
+.notFirstLine:
+	
+	; on line 12, turn off the window to split it
+	cp a, 12
+	jr nz, .skipWindowOff
+	ld a, 167
+	ldh [rWX], a
+	jr .done
+.skipWindowOff:
+
+	; if line 144-12 turn window on
+	cp a, 144-12
+	jr nz, .skipWindowOn
+	ld a, 7
+	ldh [rWX], a
+	jr .done
+.skipWindowOn:
+
+	; turn off sprites when drawing the hud
+	cp a, 144-32
+	jr nz, .ignoreSpritesOff
+
+	ldh a, [rLCDC]
+	bit 5, a
+	jr z, .ignoreSpritesOff
+	res 1, a
+	ldh [rLCDC], a
+.ignoreSpritesOff:
+
+.done: 
