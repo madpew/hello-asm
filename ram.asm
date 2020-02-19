@@ -27,5 +27,17 @@ wInputChanged: ds 1
 wLFSR: ds 1
 
 SECTION "USER MEMORY", WRAM0
+wScore: ds 1
+wLives: ds 1
 
-wTemp: ds 1
+;wStage: ds 1
+wHitEffectCounter: ds 1
+HIT_DURATION EQU 30
+wPlayerX: ds 1
+
+wPlayerFlags: ds 1
+PLAYER_HIT EQU      %00000001
+PLAYER_HASBALL EQU  %00000010
+PLAYER_CATCH EQU    %00000100
+
+

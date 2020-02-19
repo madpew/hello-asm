@@ -1,7 +1,7 @@
 ; entry point to load this scene
 LoadLoser:
-    ;update map
-	;load_shadow_map loserdata, losersize
+
+	load_shadow_map CatOverMapData, CATOVER_MAP_SIZE
 
 	ret
 
@@ -9,6 +9,10 @@ LoadLoser:
 ; do vblank stuff first
 TickLoser:
 
+	;scroll bg tile
+	ld hl, _VRAM
+	call ScrollTileLeftHBlank
+	
 	is_key_pressed KEY_START
 	ret z
 

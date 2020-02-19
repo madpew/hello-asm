@@ -9,6 +9,10 @@ LoadHelp:
 ; do vblank stuff first
 TickHelp:
 
+    ;scroll bg tile
+	ld hl, _VRAM
+	call ScrollTileRightHBlank
+
     is_key_pressed KEY_SELECT
 	ret z
 

@@ -1,9 +1,28 @@
 open tasks:
-- implement sound fx
-- implement menu / cursor functionality
-- implement music
 
 later:
 - look into meta-tiles, meta-maps etc.
 - look into 4bit packing (like I used in the GBDK version of PSS)
 - optimize functions calls by using RST Vectors: e.g. put "jp hl" at offset $8 and  use "rst $8" instead of "call _hl"
+
+Game:
+    update player sprites
+    update scores
+    update hud-ball tile
+    add sounds
+
+    implement throw logic
+    implement collisions
+    implement enemy AI and catching
+
+Optional: 
+    Add Clouds + HBlank Scroll
+    Add Buildings (Background)
+    Add props (animate them using shadow map)
+    add back rain to use excess sprites
+    add music
+
+    add preroll scene (nintendo logo being whiped away by flying ball sprites)
+
+    add effects to win/loose screens + scores!
+    
