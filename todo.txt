@@ -4,7 +4,6 @@ later:
 - look into meta-tiles, meta-maps etc.
 - look into 4bit packing (like I used in the GBDK version of PSS)
 
-
 Game:
     1 day
     implement throw logic
@@ -12,9 +11,6 @@ Game:
 
     25 3 days
     implement enemy AI and catching
-
-    1 day
-    add sounds (throw, catch, damage, hit, miss)
 
 Other:
     28 1 day
@@ -25,22 +21,9 @@ Other:
     photos and writeup
 
 Optional: 
-    1 day
+    1 day polish
     - add 2 cloud sprites?
-    - add props
-
+    - sound design
+    - add props to map
     - better screen transition (an actual effect maybe?)
     - add music
-
-
-    sprites: 
-        3player
-        1 ball player
-        2x3 clouds
-        
-        18 enemies
-        9 per enemy (4 enemy 4 wallblocks + ball)
-        
-        25 sprites in total
-        
-    

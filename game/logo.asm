@@ -16,7 +16,7 @@ LoadLogo:
 
     ;balls
     set_sprite 0, 16+8*8, 0, $1A, 0
-    set_sprite 1, 16+8*9, 244, $1A, 0
+    set_sprite 1, 16+8*9, 252, $1A, 0
 
     ;cat
     set_sprite 2, 16+144, 7+64, $1D, 0
@@ -134,7 +134,7 @@ TickLogo:
     ret
 .skipSfxThrow2
 
-    cp 60
+    cp 50
     jr nz, .skipCatUp
     ld a, [wAnimationFlags]
     set 0, a
@@ -142,7 +142,7 @@ TickLogo:
     ret
 .skipCatUp
 
-    cp 76
+    cp 66
     jr nz, .skipCatStop
     ld a, [wAnimationFlags]
     res 0, a
@@ -150,13 +150,13 @@ TickLogo:
     ret
 .skipCatStop
 
-    cp 85
+    cp 75
     jr nz, .skipCatMew
     call SfxMew
     ret
 .skipCatMew
 
-    cp 120
+    cp 110
     jr nz, .skipCatDown
     ld a, [wAnimationFlags]
     res 0, a
@@ -166,7 +166,7 @@ TickLogo:
 .skipCatDown
 
     ;finish condition
-    cp 160
+    cp 150
     ret nz    
 	
     switch_scene SCENE_INTRO

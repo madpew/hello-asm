@@ -10,7 +10,7 @@
 00:0091 InterruptVBlank.offset
 00:0061 InitializeDMA
 00:0029 InterruptLCDC
-00:07B1 BootSequence
+00:0821 BootSequence
 00:0000 GameLoop
 00:06AF MemCopy
 00:0787 SoundOff
@@ -41,8 +41,8 @@
 00:0753 MemCopyBlock.foreachRow
 00:0783 GetNextRandom.noXor
 00:06A7 MemSetHBlank
-00:079C SfxThrow
-00:079C SfxMew
+00:07FB SfxThrow
+00:080C SfxMew
 00:0751 MemCopyBlock
 00:0770 QueueShadowUpdate
 00:0683 ScrollTileRightHBlank
