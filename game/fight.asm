@@ -1,3 +1,9 @@
+PLAYER_Y EQU 120+16
+
+
+SPRITE_ARM EQU      2
+SPRITE_BULLET EQU   3
+
 ; entry point to load this scene
 LoadFight:
 
@@ -11,12 +17,22 @@ LoadFight:
 
     ld a, 7
     ld [wLives], a
+    
+    ld a, $99
+    ld [wTime], a
 
     ld a, 0
     ld [wScoreLowBcd], a
     ld [wScoreHighBcd], a
     ld [wPlayerFlags], a
     ld [wHitEffectCounter], a
+
+
+    set_sprite  0, PLAYER_Y, 100, TILEIDX_PLAYERLEFT, 0
+    set_sprite  1, PLAYER_Y, 100+8, TILEIDX_PLAYERRIGHT, 0
+    set_sprite  SPRITE_ARM, PLAYER_Y, 100+16, TILEIDX_PAWRIGHT, 0
+
+    set_sprite  SPRITE_BULLET, PLAYER_Y-4, 100+16+2, TILEIDX_BALL, 0
 
 	ret
 
@@ -25,6 +41,17 @@ LoadFight:
 TickFight:
 
     ;code that runs every frame
+    ld a, [wPlayerX]
+    ld d, 8
+    ld bc, 4
+    ld hl, wShadowOam + 1
+    ld [hl], a
+    add hl, bc
+    add a, d
+    ld [hl], a
+    add hl, bc
+    add a, d
+    ld [hl], a
 
     ;scroll sky
     ld a, [wFrames]
@@ -59,12 +86,41 @@ TickFight:
     ld [wPaletteBg], a
 .noHitEffect:    
 
+    ; update timer
+    ld a, [wFrames]
+    and $3F ; 63
+    jr nz, .noTimerUpdate
+    ld a, [wTime]
+    dec a
+    daa 
+    ld [wTime], a
+    jr nz, .noTimeUp
+    switch_scene SCENE_WIN
+    ret
+.noTimeUp:
+    ;update time display
+    ld b, a
+    ld hl, wShadowMap + 9
+    ld c, TILEIDX_NUMBERS
+    ld d, $0f
 
-    ; update gfx state
+    swap a
+    and d
+    add a, c
+    ld [hli], a
+
+    ld a, b
+    and d
+    add a, c
+    ld [hl], a
+
+.noTimerUpdate:
+
+    
 
     is_key_pressed KEY_START
     jr z, .noWin
-    switch_scene SCENE_WIN
+    
 .noWin:    
 
     is_key_pressed KEY_SELECT
@@ -145,7 +201,7 @@ TickFight:
 .noUp:   
 
 
-    is_key_pressed KEY_LEFT
+    is_key_held KEY_LEFT
     jr z, .noLeft
     ld a, [wPlayerX]
     cp a, 16
@@ -154,7 +210,7 @@ TickFight:
     ld [wPlayerX], a
 .noLeft:    
 
-    is_key_pressed KEY_RIGHT
+    is_key_held KEY_RIGHT
     jr z, .noRight
     ld a, [wPlayerX]
     cp a, 160-16

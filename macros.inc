@@ -56,6 +56,16 @@ load_shadow_map : MACRO
 	call QueueShadowUpdate
     ENDM
 
+; Copies data to the shadow-map and queues the update
+; @param \1 Label of the data to copy
+; @param \2 2-byte size (w/h) of the area to copy
+load_map : MACRO
+	ld de, \1
+	ld hl, _SCRN0
+	ld bc, \2
+	call MemCopyBlock
+    ENDM
+
 ; @param \1 The label of the jumptable
 ; @param bc The offset into the jumptable (Index*2 because of 16bit width)
 lookup_jump : MACRO ; Requires offset (index *2) in BC \1 table-address

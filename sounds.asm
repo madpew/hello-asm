@@ -18,7 +18,12 @@ SoundOn:
 
     ret
 
-SoundTest: ; what is $FF15 ; FF1F?
+SoundTest:
+SfxThrow:
+SfxHit:
+SfxMiss:
+SfxDmg:
+SfxMew:
     
     ld a, $51
     ldh [rNR10], a

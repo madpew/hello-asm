@@ -5,28 +5,23 @@ later:
 - look into 4bit packing (like I used in the GBDK version of PSS)
 
 
-Game: 6 days
-    1 day
-    update player sprites (3 body + ball if held)
-    implement timer + timecheck
-
+Game:
     1 day
     implement throw logic
     implement collisions
 
-    3 days
+    25 3 days
     implement enemy AI and catching
 
     1 day
     add sounds (throw, catch, damage, hit, miss)
 
-
 Other:
-    1 day
+    28 1 day
     put on cart and debug/test
     cover art and box
 
-    1 day
+    29 1 day
     photos and writeup
 
 Optional: 
@@ -34,8 +29,6 @@ Optional:
     - add 2 cloud sprites?
     - add props
 
-    - add preroll scene (nintendo logo being whiped away by flying ball sprites)
-    
     - better screen transition (an actual effect maybe?)
     - add music
 

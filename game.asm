@@ -1,12 +1,14 @@
 SECTION	"GAME", ROM0
 
 ; currentScene enum
-SCENE_INTRO EQU 0
-SCENE_GAME EQU 1
-SCENE_WIN EQU 2
-SCENE_LOST EQU 3
-SCENE_HELP EQU 4
+SCENE_LOGO EQU 0
+SCENE_INTRO EQU 1
+SCENE_GAME EQU 2
+SCENE_WIN EQU 3
+SCENE_LOST EQU 4
+SCENE_HELP EQU 5
 
+include "game/logo.asm"
 include "game/intro.asm"
 include "game/fight.asm"
 include "game/winner.asm"
@@ -14,6 +16,7 @@ include "game/loser.asm"
 include "game/help.asm"
 
 FuncTableLoad:
+dw	LoadLogo
 dw	LoadIntro
 dw	LoadFight
 dw	LoadWinner
@@ -21,6 +24,7 @@ dw	LoadLoser
 dw	LoadHelp
 
 FuncTableTick:
+dw 	TickLogo
 dw	TickIntro
 dw	TickFight
 dw	TickWinner

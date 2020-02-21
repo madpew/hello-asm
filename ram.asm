@@ -26,10 +26,13 @@ wInputChanged: ds 1
 
 wLFSR: ds 1
 
+wAnimationFlags: ds 1
+
 SECTION "USER MEMORY", WRAM0
 wScoreHighBcd: ds 1
 wScoreLowBcd: ds 1
 wLives: ds 1
+wTime: ds 1
 
 ;wStage: ds 1
 wHitEffectCounter: ds 1

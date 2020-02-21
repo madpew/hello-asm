@@ -9,6 +9,7 @@ LoadIntro:
 	ld de, _VRAM
 	call MemCopy
 
+	load_map CatIntroMapData, CATINTRO_MAP_SIZE
 	load_shadow_map CatIntroMapData, CATINTRO_MAP_SIZE
 
 	call ClearAllSprites

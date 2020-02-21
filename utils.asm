@@ -94,6 +94,16 @@ ScrollTileLeftHBlank:
 
     ret 
 
+; HL - start address of the tile
+; B - tile id to write
+MemSetHBlank:
+.waitVRAMReady:
+    ldh a, [rSTAT]
+    and STATF_BUSY
+    jr nz, .waitVRAMReady
+    ld [hl], b
+    ret 
+
 
 ; HL - memory position of the start of the copying source
 ; DE - memory position of the start of the copying destination
