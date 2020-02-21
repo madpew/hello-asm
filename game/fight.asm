@@ -2,7 +2,7 @@
 LoadFight:
 
     load_shadow_map CatGroundMapData, CATGROUND_MAP_SIZE
-    
+    call ClearAllSprites
     call SoundTest ;test sound
 
     ; init game state
@@ -13,7 +13,8 @@ LoadFight:
     ld [wLives], a
 
     ld a, 0
-    ld [wScore], a
+    ld [wScoreLowBcd], a
+    ld [wScoreHighBcd], a
     ld [wPlayerFlags], a
     ld [wHitEffectCounter], a
 
@@ -24,6 +25,14 @@ LoadFight:
 TickFight:
 
     ;code that runs every frame
+
+    ;scroll sky
+    ld a, [wFrames]
+    and %00000011
+    jr nz, .noScrollSky
+    ld hl, _VRAM
+	call ScrollTileRightHBlank
+.noScrollSky:
 
     ld a, [wHitEffectCounter]
     and a
@@ -68,20 +77,73 @@ TickFight:
 
     ld a, [wPlayerFlags]
     and PLAYER_HIT
-    jr nz, .skipInput
+    jp nz, .skipInput
     
     is_key_pressed KEY_B
     jr z, .noThrow
-    ;throw
+    
+    ; check if has ball
+    ld a, [wPlayerFlags]
+    bit 1, a
+    jr z, .noThrow
+
+    res 1, a
+    ld [wPlayerFlags], a
+    ; launch projectile
+    ;update hud
+    call updateHUDBallStatus
+    
 .noThrow:   
 
     is_key_pressed KEY_A
     jr z, .noCatch
     ;catch
-    ;debug: set player hit
-    call PlayerHit
+    ld a, [wPlayerFlags]
+    set 1, a
+    ld [wPlayerFlags], a
+
+    call updateHUDBallStatus
 
 .noCatch:   
+
+;TESTING
+  is_key_pressed KEY_UP
+    jr z, .noUp
+
+    ;increase score
+    ld a, [wScoreLowBcd]
+    add a, 4 ;debug add 4 each click
+    daa
+    ld [wScoreLowBcd], a
+    ld b, a
+    ld a, [wScoreHighBcd]
+    jr nc, .scoreIncDone
+    inc a
+.scoreIncDone:
+    ld [wScoreHighBcd], a
+
+    ;update score-display
+    ld hl, wShadowMap + 32*17 + 16
+    ld c, TILEIDX_NUMBERS
+    ld d, $0f
+    and d
+    add a, c
+    ld [hli], a
+
+    ld a, b
+    swap a
+    and d
+    add a, c
+    ld [hli], a
+
+    ld a, b
+    and d
+    add a, c
+    ld [hl], a
+
+    ;call PlayerHit
+.noUp:   
+
 
     is_key_pressed KEY_LEFT
     jr z, .noLeft
@@ -104,12 +166,14 @@ TickFight:
 .skipInput:
 
 
+    call AnimateGrass
+
     ;make the shadow map update every frame    
     xor $ff
     ld [wShadowMapUpdate], a
 
     ret
-
+; ====================================================================================================
 PlayerHit:
     ld a, HIT_DURATION
     ld [wHitEffectCounter], a
@@ -132,3 +196,58 @@ PlayerHit:
     add hl, bc
     ld [hl], TILEIDX_HEARTEMPTY
     ret
+
+
+;call on catch or throw, inline
+updateHUDBallStatus:
+    ld b, TILEIDX_ENERGY
+    ld a, [wPlayerFlags]
+    and PLAYER_HASBALL
+    jr nz, .hasBall
+    ld b, TILEIDX_ENERGYEMPTY
+.hasBall:
+    ld hl, wShadowMap + 32*17 + 10
+    ld [hl], b
+
+    ret
+
+;Animates the grass
+AnimateGrass:
+	ld a, [wFrames]
+	and %00011111 ; animation speed divider, careful not to sync with shadow-map copy interval or animation will not be visible (more than 16)
+	jr nz, .noAnimation
+	ld hl, wShadowMap + 32*4
+    ld a, [wFrames]
+    and a, %00100000
+    jr z, .noAnimationShift
+    inc hl
+.noAnimationShift:
+	ld bc, (32*12)/2
+	inc b
+    inc c
+	dec hl
+    dec hl
+	jr .checkNext
+.animate:
+	ld a, [hl]
+	cp a, 85
+	jr nz, .check86
+	inc a
+	ld [hl], a
+	jr .checkNext
+.check86	
+	cp a, 86
+	jr nz, .checkNext
+	dec a
+	ld [hl], a
+
+.checkNext:	
+	inc hl
+    inc hl
+	dec c
+	jr nz, .animate
+	dec b
+	jr nz, .animate
+.animationDone:
+.noAnimation:
+	ret 

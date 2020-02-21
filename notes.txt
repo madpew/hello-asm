@@ -1,3 +1,7 @@
+Ideas for optimizations:
+
+CAUTION: Do not optimize if not required to keep the code clean (easier to read and understand + reuse)
+
 Intro-Screen:
     Updating the whole shadow-map in vblank is very inefficient for the used effect.
     Only a single line of tiles is changed, so this could be either done in hblank or optimized to only update that row.
@@ -6,25 +10,8 @@ Winner/Loser-Screen:
     Both are rather static screens (right now) and could share the same Tick-procedure.
     Custom animations will require splitting them again, but with some clever planning this could be avoided as well.
 
-Fight-Screen:
-    The HUD could be part of the background instead, to not require messing with the window at all.
+ShadowMap:
+    Since the whole game doesn't scroll, the shadow-map could be sped up by only copying the 20x18 area instead of the whole map.
 
 General:
-    Since the whole game doesn't scroll (should the fight scene be scrollable?), the shadow-map could be sped up by only copying the 20x18 area instead of the whole map.
-
-
-
-    	ld hl, FuncTableLoad
-
-	ld c, a
-
-	; update current scene
-	ld [wCurrentScene], a
-	; reset counter
-	xor a
-	ld [wFrameCounter], a
-
-	ld b, a
-	
-	add hl, bc
-	jp hl
+    Optimize calls by using RST Vectors: e.g. put "jp hl" at offset $8 and  use "rst $8" instead of "call _hl"

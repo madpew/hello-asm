@@ -27,7 +27,8 @@ wInputChanged: ds 1
 wLFSR: ds 1
 
 SECTION "USER MEMORY", WRAM0
-wScore: ds 1
+wScoreHighBcd: ds 1
+wScoreLowBcd: ds 1
 wLives: ds 1
 
 ;wStage: ds 1

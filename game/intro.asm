@@ -11,6 +11,7 @@ LoadIntro:
 
 	load_shadow_map CatIntroMapData, CATINTRO_MAP_SIZE
 
+	call ClearAllSprites
 	call TurnScreenOn
 	ei
 	ret

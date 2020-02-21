@@ -2,7 +2,7 @@
 LoadHelp:
 	
 	load_shadow_map CatTutorialMapData, CATTUTORIAL_MAP_SIZE
-	
+	call ClearAllSprites
 	ret
 
 ; entry point each frame

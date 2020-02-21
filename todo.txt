@@ -3,26 +3,51 @@ open tasks:
 later:
 - look into meta-tiles, meta-maps etc.
 - look into 4bit packing (like I used in the GBDK version of PSS)
-- optimize functions calls by using RST Vectors: e.g. put "jp hl" at offset $8 and  use "rst $8" instead of "call _hl"
 
-Game:
-    update player sprites
-    update scores
-    update hud-ball tile
-    add sounds
 
+Game: 6 days
+    1 day
+    update player sprites (3 body + ball if held)
+    implement timer + timecheck
+
+    1 day
     implement throw logic
     implement collisions
+
+    3 days
     implement enemy AI and catching
 
+    1 day
+    add sounds (throw, catch, damage, hit, miss)
+
+
+Other:
+    1 day
+    put on cart and debug/test
+    cover art and box
+
+    1 day
+    photos and writeup
+
 Optional: 
-    Add Clouds + HBlank Scroll
-    Add Buildings (Background)
-    Add props (animate them using shadow map)
-    add back rain to use excess sprites
-    add music
+    1 day
+    - add 2 cloud sprites?
+    - add props
 
-    add preroll scene (nintendo logo being whiped away by flying ball sprites)
+    - add preroll scene (nintendo logo being whiped away by flying ball sprites)
+    
+    - better screen transition (an actual effect maybe?)
+    - add music
 
-    add effects to win/loose screens + scores!
+
+    sprites: 
+        3player
+        1 ball player
+        2x3 clouds
+        
+        18 enemies
+        9 per enemy (4 enemy 4 wallblocks + ball)
+        
+        25 sprites in total
+        
     
