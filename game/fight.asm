@@ -2,7 +2,9 @@ PLAYER_Y EQU 120+16
 
 
 SPRITE_ARM EQU      2
-SPRITE_BULLET EQU   3
+SPRITE_ARM2 EQU     3
+SPRITE_BULLET_START EQU 20
+BALL_SPEED EQU 4
 
 ; entry point to load this scene
 LoadFight:
@@ -26,13 +28,12 @@ LoadFight:
     ld [wScoreHighBcd], a
     ld [wPlayerFlags], a
     ld [wHitEffectCounter], a
-
+    ld [wBallDirection], a
 
     set_sprite  0, PLAYER_Y, 100, TILEIDX_PLAYERLEFT, 0
     set_sprite  1, PLAYER_Y, 100+8, TILEIDX_PLAYERRIGHT, 0
-    set_sprite  SPRITE_ARM, PLAYER_Y, 100+16, TILEIDX_PAWRIGHT, 0
-
-    set_sprite  SPRITE_BULLET, PLAYER_Y-4, 100+16+2, TILEIDX_BALL, 0
+    set_sprite  SPRITE_ARM, 144+16, 100+16, TILEIDX_PAWRIGHT, 0
+    set_sprite  SPRITE_ARM2, 144+16, 100-8, TILEIDX_PAWLEFT, 0
 
 	ret
 
@@ -59,6 +60,10 @@ TickFight:
     jr nz, .noScrollSky
     ld hl, _VRAM
 	call ScrollTileRightHBlank
+
+    ; todo: Inline this
+    call MoveBalls
+
 .noScrollSky:
 
     ld a, [wHitEffectCounter]
@@ -135,20 +140,40 @@ TickFight:
     and PLAYER_HIT
     jp nz, .skipInput
     
-    is_key_pressed KEY_B
-    jr z, .noThrow
+    is_key_held KEY_B
+    jr z, .notThrow
     
+
+    ; check if already throwing
+    ld a, [wPlayerFlags]
+    and a, PLAYER_THROWING
+
+    ;show arm
+	ld a, PLAYER_Y
+	ld [wShadowOam + SPRITE_ARM * 4], a
+	
+	ld a, [wPlayerX]
+    add a, 16
+	ld [wShadowOam + 1 + SPRITE_ARM * 4], a
+	
     ; check if has ball
     ld a, [wPlayerFlags]
-    bit 1, a
+    bit 1, a ;hasball
     jr z, .noThrow
 
-    res 1, a
+    res 1, a ; hasball no more
+    set 3, a ; throwing
     ld [wPlayerFlags], a
+    
     ; launch projectile
+    call SpawnPlayerBall
+
     ;update hud
     call updateHUDBallStatus
-    
+    jr .noThrow
+.notThrow:
+	ld a, 0
+	ld [wShadowOam + SPRITE_ARM * 4], a
 .noThrow:   
 
     is_key_pressed KEY_A
@@ -180,24 +205,9 @@ TickFight:
 
     ;update score-display
     ld hl, wShadowMap + 32*17 + 16
-    ld c, TILEIDX_NUMBERS
-    ld d, $0f
-    and d
-    add a, c
-    ld [hli], a
+	call PrintScore
 
-    ld a, b
-    swap a
-    and d
-    add a, c
-    ld [hli], a
-
-    ld a, b
-    and d
-    add a, c
-    ld [hl], a
-
-    ;call PlayerHit
+    call PlayerHit
 .noUp:   
 
 
@@ -307,3 +317,89 @@ AnimateGrass:
 .animationDone:
 .noAnimation:
 	ret 
+
+
+SpawnPlayerBall:
+    ;find first free ball-sprite slot
+    ;set position
+    ;set wBallDirection
+    ld d, 8
+    ld e, 1 ;mask
+    ld bc, 4    ;increaser
+    ld hl, wShadowOam + 4 * SPRITE_BULLET_START
+.nextSlot:
+    ld a, [hl]
+    and a
+    jr nz, .advanceBall
+
+    ;found an empty slot
+    ld a, PLAYER_Y - 2
+    ld [hli], a
+    ld a, [wPlayerX]
+    add a, 16 + 2
+    ld [hli], a
+    ld a, TILEIDX_BALL
+    ld [hli], a
+    xor a
+    ld [hli], a
+
+    ld a, [wBallDirection]
+    or e
+    ld [wBallDirection], a 
+    call SfxThrow
+    ret
+.advanceBall:
+    add hl, bc
+    dec d
+    sla e
+    jr nz, .nextSlot
+    ret
+
+MoveBalls:
+    ld a, [wBallDirection]
+    ld d, a
+    ld e, 1     ;e ball mask
+    ld bc, 4    ;increaser
+    ld hl, wShadowOam + 4 * SPRITE_BULLET_START
+
+.nextBall:
+    ld a, [hl]
+    and a
+    jr z, .advanceBall
+    ;check ball direction
+    ld a, d
+    and e
+    jr z, .moveDown
+.moveUp:
+    ld a, [hl]
+    sub a, BALL_SPEED
+    ld [hl], a
+    jr .checkCollisions
+.moveDown:
+    ld a, [hl]
+    add a, BALL_SPEED
+    ld [hl], a
+
+.checkCollisions:
+    ;collision check, a = ball Y
+    cp a, 32
+    jr nc, .topCheckPassed
+    xor a
+    ld [hl], a
+    call SfxMiss
+.topCheckPassed:
+
+    cp a, PLAYER_Y
+    jr c, .bottomCheckPassed
+    xor a
+    ld [hl], a
+    call SfxMiss
+.bottomCheckPassed:
+
+    ;todo: implement collisions here
+.advanceBall:
+    add hl, bc
+    sla e
+    jr nz, .nextBall
+
+    ret

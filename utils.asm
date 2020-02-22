@@ -383,16 +383,27 @@ GetNextRandom:
 	ld [wLFSR], a
 	ret
 
-;GetNextRandom:
-;    push bc
-;	ld a, [wLFSR]
-;	ld b, a
-;	and a, %10000000
-;	jr z, .doShift
-;	ld a, b
-;	xor %00001110
-;.doShift:
-;	rlc a
-;   pop bc
-;	ld [wLFSR], a
-;	ret
+; @param HL destination address of the first digit
+PrintScore:
+
+    ld c, TILEIDX_NUMBERS
+    ld d, $0f
+
+    ld a, [wScoreHighBcd]
+    and d
+    add a, c
+    ld [hli], a
+
+	ld a, [wScoreLowBcd]
+    ld b, a
+    swap a
+    and d
+    add a, c
+    ld [hli], a
+
+    ld a, b
+    and d
+    add a, c
+    ld [hl], a
+
+    ret 

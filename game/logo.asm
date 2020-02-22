@@ -35,11 +35,14 @@ LoadLogo:
 ; do vblank stuff first
 TickLogo:
 
-    ;update balls
+; update flying balls
+    ; update sprite position
     ld hl, wShadowOam + 1
     ld a, [hl]
     add a, 4
     ld [hl], a
+
+    ; calculate and clear underlying tile
     ld c, a
     ld d, a
     ld b,0
@@ -51,34 +54,38 @@ TickLogo:
     add hl, bc
     call MemSetHBlank
 
+    ; turn off sprite if it passed the screen
     ld a, d
     and a
     jr nz, .keep1
     clear_sprite 0
 .keep1:
 
+    ; update sprite position
     ld hl, wShadowOam + 1 + 4
     ld a, [hl]
     sub a, 4
     ld [hl], a
+
+    ; calculate and clear underlying tile
     ld c, a
     ld d, a
     ld b,0
     srl c   
     srl c   
     srl c
-
-
     ld hl, _SCRN0 + 32*9
     add hl, bc
     call MemSetHBlank
 
+    ; turn off sprite if it passed the screen
     ld a, d
     and a
     jr nz, .keep2
     clear_sprite 1
 .keep2:
 
+; move cat up
     ld a, [wAnimationFlags]
     ld d, a
     bit 0, d
@@ -86,7 +93,6 @@ TickLogo:
     ld a, [wFrames]
     and %00000001
     jr nz, .noMoveUp
-    ;move cat up
     ld bc, 4
     ld hl, wShadowOam + 8
     dec [hl]
@@ -100,13 +106,12 @@ TickLogo:
 
 .noMoveUp:
 
-    
+; move cat down    
     bit 1, d
     jr z, .noMoveDown
     ld a, [wFrames]
     and %00000001
     jr nz, .noMoveDown
-    ;move cat up
     ld bc, 4
     ld hl, wShadowOam + 8
     inc [hl]
@@ -119,9 +124,9 @@ TickLogo:
     add hl, bc
 .noMoveDown:
 
+; animation state timeline (set animation flags according to passed framecount)
     ld a, [wFrameCounter]
 
-    ;compare time and set flags on different values
     cp 1
     jr nz, .skipSfxThrow1
     call SfxThrow

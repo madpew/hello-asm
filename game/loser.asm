@@ -4,27 +4,8 @@ LoadLoser:
 	load_shadow_map CatOverMapData, CATOVER_MAP_SIZE
 	call ClearAllSprites
 
-    ;update score-display	
     ld hl, wShadowMap + 32*6 + 7
-    ld c, TILEIDX_NUMBERS
-    ld d, $0f
-
-    ld a, [wScoreHighBcd]
-    and d
-    add a, c
-    ld [hli], a
-
-	ld a, [wScoreLowBcd]
-    ld b, a
-    swap a
-    and d
-    add a, c
-    ld [hli], a
-
-    ld a, b
-    and d
-    add a, c
-    ld [hl], a
+	call PrintScore
 
 	ret
 
