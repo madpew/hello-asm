@@ -8,12 +8,12 @@ SCENE_WIN EQU 3
 SCENE_LOST EQU 4
 SCENE_HELP EQU 5
 
-include "game/logo.asm"
-include "game/intro.asm"
-include "game/fight.asm"
-include "game/winner.asm"
-include "game/loser.asm"
-include "game/help.asm"
+include "scenes/logo.asm"
+include "scenes/intro.asm"
+include "scenes/fight.asm"
+include "scenes/winner.asm"
+include "scenes/loser.asm"
+include "scenes/help.asm"
 
 FuncTableLoad:
 dw	LoadLogo

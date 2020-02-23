@@ -1,7 +1,8 @@
 # Todo
 
 ## Core-Game (3 days)
-- implement catching
+- refactor fight.asm to make code easier to read
+- enemy display
 - implement collisions against (static) enemies
 - implement enemy AI and catching
     1) random spawn enemy wEnemyX (tile alignment) upper and lower nibble
@@ -13,14 +14,12 @@
     (counters for each enemy for timing)
 
 ## Optional Features (Wishlist)
-- turn off sprites during hblank on line to stop bullets from overlapping HUD
 - add second arm to hit-animation
-- add 2 cloud sprites scrolling along in the background
-- add a mice sprite (running accross the field)
+- add 2 cloud sprites scrolling along in the background or mouse running across the field
 - make better sounds (layer the channels to get richer effects)
 - add static props to map (plenty of memory left for additional tiles)
-- add a proper screen transition instead of using the shadow-map refresh as an transition
 - add music (custom music format or go with a proven solution)
+- add a proper screen transition instead of using the shadow-map refresh as an transition
 
 ## Finish: (1-2 days)
 
@@ -33,7 +32,3 @@
 
 - look into meta-tiles, meta-maps and meta sprites
 - look into 4bit packing for maps (like I used in the GBDK version of PSS)
-
-
-### Todo tomorrow:
-Check why MoveBall.catchCheck sees wPlayerFlags as 0 instead of having PLAYER_CATCH set
