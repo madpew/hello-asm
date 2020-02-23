@@ -1,5 +1,5 @@
 PLAYER_Y EQU 120+16
-
+ENEMY_Y EQU 16+24
 
 SPRITE_ARM EQU      2
 SPRITE_ARM2 EQU     3
@@ -23,12 +23,23 @@ LoadFight:
     ld a, $99
     ld [wTime], a
 
+    ld a, PLAYER_HASBALL
+    ld [wPlayerFlags], a
+
     ld a, 0
     ld [wScoreLowBcd], a
     ld [wScoreHighBcd], a
-    ld [wPlayerFlags], a
     ld [wHitEffectCounter], a
     ld [wBallDirection], a
+
+    ld [wEnemy1X], a
+    ld [wEnemy1Timer], a
+    ld [wEnemy1State], a
+
+    ld [wEnemy2X], a
+    ld [wEnemy2Timer], a
+    ld [wEnemy2State], a
+    ld [wGameState], a
 
     set_sprite  0, PLAYER_Y, 100, TILEIDX_PLAYERLEFT, 0
     set_sprite  1, PLAYER_Y, 100+8, TILEIDX_PLAYERRIGHT, 0
@@ -42,6 +53,7 @@ LoadFight:
 TickFight:
 
     ;code that runs every frame
+    ;update player sprites
     ld a, [wPlayerX]
     ld d, 8
     ld bc, 4
@@ -54,6 +66,16 @@ TickFight:
     add a, d
     ld [hl], a
 
+
+    ;reset player flags
+    ld a, PLAYER_THROWING | PLAYER_CATCH
+    xor $ff
+    ld b, a
+    ld a, [wPlayerFlags]
+    and b
+    ld [wPlayerFlags], a
+
+
     ;scroll sky
     ld a, [wFrames]
     and %00000011
@@ -61,7 +83,6 @@ TickFight:
     ld hl, _VRAM
 	call ScrollTileRightHBlank
 
-    ; todo: Inline this
     call MoveBalls
 
 .noScrollSky:
@@ -122,17 +143,22 @@ TickFight:
 .noTimerUpdate:
 
     
-
+IF DEBUG
     is_key_pressed KEY_START
-    jr z, .noWin
-    
-.noWin:    
+    jr z, .noStart
+    ld a, 80
+    ld d, a
+    call SpawnEnemyBall
+.noStart:    
+
 
     is_key_pressed KEY_SELECT
-    jr z, .noLoose
-    switch_scene SCENE_LOST
-.noLoose:    
-
+    jr z, .noSelect
+    ld a, [wPlayerFlags]
+    or PLAYER_HASBALL
+    ld [wPlayerFlags], a
+.noSelect:    
+ENDC
 
     ; branch according to player state
 
@@ -143,26 +169,16 @@ TickFight:
     is_key_held KEY_B
     jr z, .notThrow
     
-
-    ; check if already throwing
     ld a, [wPlayerFlags]
-    and a, PLAYER_THROWING
+    set 3, a ; throwing
+    ld [wPlayerFlags], a
 
-    ;show arm
-	ld a, PLAYER_Y
-	ld [wShadowOam + SPRITE_ARM * 4], a
-	
-	ld a, [wPlayerX]
-    add a, 16
-	ld [wShadowOam + 1 + SPRITE_ARM * 4], a
-	
     ; check if has ball
     ld a, [wPlayerFlags]
     bit 1, a ;hasball
     jr z, .noThrow
 
     res 1, a ; hasball no more
-    set 3, a ; throwing
     ld [wPlayerFlags], a
     
     ; launch projectile
@@ -172,20 +188,32 @@ TickFight:
     call updateHUDBallStatus
     jr .noThrow
 .notThrow:
-	ld a, 0
-	ld [wShadowOam + SPRITE_ARM * 4], a
 .noThrow:   
 
-    is_key_pressed KEY_A
+    is_key_held KEY_A
     jr z, .noCatch
-    ;catch
     ld a, [wPlayerFlags]
-    set 1, a
+    or PLAYER_CATCH
     ld [wPlayerFlags], a
-
-    call updateHUDBallStatus
-
 .noCatch:   
+
+    ;check for ARM display
+.checkArm:
+    ld a, [wPlayerFlags]
+    and PLAYER_THROWING | PLAYER_CATCH
+    jr z, .noArm
+
+    ld a, PLAYER_Y
+	ld [wShadowOam + SPRITE_ARM * 4], a
+	
+	ld a, [wPlayerX]
+    add a, 16
+	ld [wShadowOam + 1 + SPRITE_ARM * 4], a
+
+    jr .armCheckDone
+.noArm
+	ld [wShadowOam + SPRITE_ARM * 4], a
+.armCheckDone:
 
 ;TESTING
   is_key_pressed KEY_UP
@@ -206,8 +234,6 @@ TickFight:
     ;update score-display
     ld hl, wShadowMap + 32*17 + 16
 	call PrintScore
-
-    call PlayerHit
 .noUp:   
 
 
@@ -231,18 +257,24 @@ TickFight:
 
 .skipInput:
 
-
     call AnimateGrass
 
     ;make the shadow map update every frame    
     xor $ff
     ld [wShadowMapUpdate], a
 
+    ld a, [wGameState]
+    and GAME_STATE_OVER
+    ret z
+
+    switch_scene SCENE_LOST
     ret
 ; ====================================================================================================
 PlayerHit:
-    ld a, HIT_DURATION
-    ld [wHitEffectCounter], a
+    push af
+    push hl
+    push bc
+
     
     ld a, [wPlayerFlags]
     set 0, a
@@ -252,8 +284,10 @@ PlayerHit:
     dec a
     ld [wLives], a
     jr nz, .updateLives
-    switch_scene SCENE_LOST
-    ret
+    ld a, [wGameState]
+    or GAME_STATE_OVER
+    ld [wGameState], a
+    jr .hitDone
 .updateLives:
     ;a has lives (use as offset)
     ld b, 0
@@ -261,6 +295,13 @@ PlayerHit:
     ld hl, wShadowMap + 32*17 + 1
     add hl, bc
     ld [hl], TILEIDX_HEARTEMPTY
+    call SfxDmg
+    ld a, HIT_DURATION
+    ld [wHitEffectCounter], a
+.hitDone:
+    pop bc
+    pop hl
+    pop af
     ret
 
 
@@ -323,7 +364,7 @@ SpawnPlayerBall:
     ;find first free ball-sprite slot
     ;set position
     ;set wBallDirection
-    ld d, 8
+    
     ld e, 1 ;mask
     ld bc, 4    ;increaser
     ld hl, wShadowOam + 4 * SPRITE_BULLET_START
@@ -350,7 +391,40 @@ SpawnPlayerBall:
     ret
 .advanceBall:
     add hl, bc
-    dec d
+    sla e
+    jr nz, .nextSlot
+    ret
+
+; @param D EnemyX Position
+SpawnEnemyBall:
+    ld e, 1 ;mask
+    ld bc, 4    ;increaser
+    ld hl, wShadowOam + 4 * SPRITE_BULLET_START
+.nextSlot:
+    ld a, [hl]
+    and a
+    jr nz, .advanceBall
+
+    ;found an empty slot
+    ld a, ENEMY_Y + 2
+    ld [hli], a
+    ld a, d 
+    add a, 16 + 2
+    ld [hli], a
+    ld a, TILEIDX_BALL
+    ld [hli], a
+    xor a
+    ld [hli], a
+
+    ld a, [wBallDirection] ;double xor to set the bit to 0
+    xor $ff
+    or e
+    xor $ff
+    ld [wBallDirection], a 
+    call SfxThrow
+    ret
+.advanceBall:
+    add hl, bc
     sla e
     jr nz, .nextSlot
     ret
@@ -382,21 +456,65 @@ MoveBalls:
 
 .checkCollisions:
     ;collision check, a = ball Y
-    cp a, 32
+
+    ;check top wall
+    cp a, 40
     jr nc, .topCheckPassed
     xor a
     ld [hl], a
     call SfxMiss
 .topCheckPassed:
 
+    ;check bottom collision (player or wall) also catching!
     cp a, PLAYER_Y
     jr c, .bottomCheckPassed
+
+    ;push bc ; we need some registers to work with
+    inc hl ;advance to ballX
+    ld a, [wPlayerX]
+    sub a, 8    
+    cp a, [hl]
+    jr nc, .ballMissed ; playerX - 8 > ballX, the ball missed
+
+    ld a, [wPlayerX]
+    add a, 16 + 8 ;offset for arm    
+    cp a, [hl]
+    jr c, .ballMissed ; playerX < ballX, the ball missed
+
+    ld a, [wPlayerX]
+    add a, 16
+    cp a, [hl]
+    jr nc, .ballHit ; playerX +16 > ballX, the ball hit
+
+    ; check if catching, else ballMiss
+.catchCheck:
+    ld a, [wPlayerFlags]
+    and PLAYER_CATCH
+    jr z, .ballMissed
+
+    ;we're catching and the ball hit the arm
+    or PLAYER_HASBALL
+    ld [wPlayerFlags], a
+
+    call SfxCatch
+    call updateHUDBallStatus
+
+    jr .bottomCheckDone
+.ballHit:
+    dec hl
+    xor a
+    ld [hl], 0
+    call PlayerHit
+    jr .bottomCheckDone
+.ballMissed:
+    dec hl
     xor a
     ld [hl], a
     call SfxMiss
+.bottomCheckDone:
+    ;pop bc
 .bottomCheckPassed:
-
-    ;todo: implement collisions here
+    
 .advanceBall:
     add hl, bc
     sla e

@@ -19,6 +19,7 @@ SoundOn:
     ret
 
 SoundTest:
+SfxCatch:
 SfxHit:
     ld a, $4f
     ldh [rNR10], a

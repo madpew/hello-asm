@@ -7,3 +7,10 @@ ShadowMap:
 
 General:
     Optimize calls by using RST Vectors: e.g. put "jp hl" at offset $8 and  use "rst $8" instead of "call _hl"
+
+CP A, X
+c: A < X
+nc: A > X
+
+LESS EQUS "c"
+GREATER EQUS "nc"

@@ -1,9 +1,8 @@
 # Todo
 
 ## Core-Game (3 days)
-
-- add second arm to hit-animation
-
+- implement catching
+- implement collisions against (static) enemies
 - implement enemy AI and catching
     1) random spawn enemy wEnemyX (tile alignment) upper and lower nibble
     1.1) setup wall-sprites according to map
@@ -13,11 +12,9 @@
     4) go down after interval, repeat
     (counters for each enemy for timing)
 
-- implement collisions against player (for enemy projectiles)
-- implement collisions against enemies
-
 ## Optional Features (Wishlist)
-
+- turn off sprites during hblank on line to stop bullets from overlapping HUD
+- add second arm to hit-animation
 - add 2 cloud sprites scrolling along in the background
 - add a mice sprite (running accross the field)
 - make better sounds (layer the channels to get richer effects)
@@ -36,3 +33,7 @@
 
 - look into meta-tiles, meta-maps and meta sprites
 - look into 4bit packing for maps (like I used in the GBDK version of PSS)
+
+
+### Todo tomorrow:
+Check why MoveBall.catchCheck sees wPlayerFlags as 0 instead of having PLAYER_CATCH set
