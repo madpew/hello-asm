@@ -74,10 +74,11 @@ AIStateWait:
     ; update EnemyX
     inc hl
     call GetNextRandom
+    and $1f
     sla a ; *8 to align with tiles
     sla a
     sla a
-    or a, 7 ; always set low 8 bits
+    add a, 8 ; add 7 for the offset
     ld [hli], a
     ; set EnemyY
     ld a, ENEMY_Y + 4 
@@ -157,7 +158,7 @@ AIStateDown:
 
     dec hl
     call GetNextRandom
-    ;ld a, ENEMY_TIME_AIM
+    res 7, a
     ld [hl], a
 .continue:
     jr ProcessEnemy.done

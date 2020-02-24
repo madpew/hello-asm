@@ -2,11 +2,14 @@
 
 ## Core-Game (3 days)
 
-- implement enemy AI
-- implement Enemy X position randomizer. Align to grid, and check for overlap with other enemies
+- implement Enemy X position randomizer. check for overlap with other enemies
 - random shoot or not
+
 - add hit-tiles (x-eyes) and tile-reset on respawn
 - change player sprite to be a lighter shade
+- also slower "down" movement when hit
+
+- fix collision state check to allow more states to pass
 
 ## Optional Features (Wishlist)
 ### Phase 1 (likely)
@@ -29,5 +32,4 @@
 - Make photos and finish the article
 
 # KNOWN BUGS
-- fix enemy collision when state is WAIT
 - fix hit effect cycling BG palette instead of obj0/1

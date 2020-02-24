@@ -122,6 +122,10 @@ UpdateBalls:
     inc hl ; now ballX
 
 ; enemy 1 collision check
+    ld a, [wEnemy1State]
+    and a
+    jr z, .noEnemy1Collision
+
     ld a, [wEnemy1X]
     sub a, 8    
     cp a, [hl]
@@ -137,37 +141,8 @@ UpdateBalls:
     jr .removeBall
 .noEnemy1Collision:
 
-; enemy 2 collision check
-;    ld a, [wEnemy2X]
-;    sub a, 8    
-;    cp a, [hl]
-;    jr nc, .noEnemy2Collision
+;todo: repeat for other enemies
 
-;    ld a, [wEnemy2X]
-;    add a, 16
-;    cp a, [hl]
-;    jr c, .noEnemy2Collision
-
-    ;enemy 2 collision
-;    call PlayerScore
-;    jr .removeBall
-;.noEnemy2Collision:
-
-; enemy 3 collision check
-;    ld a, [wEnemy3X]
-;    sub a, 8    
-;    cp a, [hl]
-;    jr nc, .noEnemy3Collision
-
-;    ld a, [wEnemy3X]
-;    add a, 16
-;    cp a, [hl]
-;    jr c, .noEnemy3Collision
-
-    ;enemy 3 collision
-;    call PlayerScore
-;    jr .removeBall
-;.noEnemy3Collision:
 
 .noEnemyCollision:
     dec hl
