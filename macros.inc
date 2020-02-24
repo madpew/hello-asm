@@ -12,6 +12,20 @@ set_sprite: MACRO ; \1 \2\3\4\5
 	ld [wShadowOam + 3 + \1*4], a
 ENDM
 
+set_sprite_addr: MACRO ; \1 \2\3\4\5
+	ld a, \2
+	ld [\1], a
+	
+	ld a, \3
+	ld [\1 + 1], a
+	
+	ld a, \4
+	ld [\1 + 2], a
+	
+	ld a, \5
+	ld [\1 + 3], a
+ENDM
+
 clear_sprite: MACRO ; \1
 	xor a
 	ld [wShadowOam + \1*4], a

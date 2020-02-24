@@ -1,5 +1,46 @@
 SECTION "LOCAL OAM", WRAM0 [$C000]
-wShadowOam: ds 160
+wShadowOam:
+
+wSpritePlayer:
+wSpritePlayerLeft: ds 4
+wSpritePlayerRight: ds 4
+wSpritePlayerPawLeft: ds 4
+wSpritePlayerPawRight: ds 4
+wSpritePlayerBall: ds 4
+
+sprite6: ds 4
+sprite7: ds 4
+sprite8: ds 4
+sprite9: ds 4
+sprite10: ds 4
+sprite11: ds 4
+sprite12: ds 4
+sprite13: ds 4
+sprite14: ds 4
+sprite15: ds 4
+sprite16: ds 4
+sprite17: ds 4
+sprite18: ds 4
+sprite19: ds 4
+sprite20: ds 4
+sprite21: ds 4
+sprite22: ds 4
+
+EnemySprites:
+sprite23: ds 4
+sprite24: ds 4
+sprite25: ds 4
+sprite26: ds 4
+sprite27: ds 4
+
+sprite28: ds 4
+sprite29: ds 4
+sprite30: ds 4
+sprite31: ds 4
+sprite32: ds 4
+
+wBallSprites: ds 8*4
+
 wShadowMap: ds 1024
 wShadowMapEnd:
 
@@ -45,10 +86,13 @@ wPlayerFlags: ds 1
 
 wBallDirection: ds 1
 
-wEnemy1X : ds 1
+wEnemyData:
 wEnemy1Timer: ds 1
 wEnemy1State: ds 1
+wEnemy1X : ds 1
+wEnemy1Y : ds 1
 
-wEnemy2X : ds 1
 wEnemy2Timer: ds 1
 wEnemy2State: ds 1
+wEnemy2X : ds 1
+wEnemy2Y : ds 1

@@ -1,8 +1,7 @@
 # Todo
 
 ## Core-Game (3 days)
-- refactor fight.asm to make code easier to read
-- enemy display
+- update enemy sprites
 - implement collisions against (static) enemies
 - implement enemy AI and catching
     1) random spawn enemy wEnemyX (tile alignment) upper and lower nibble
@@ -14,7 +13,6 @@
     (counters for each enemy for timing)
 
 ## Optional Features (Wishlist)
-- add second arm to hit-animation
 - add 2 cloud sprites scrolling along in the background or mouse running across the field
 - make better sounds (layer the channels to get richer effects)
 - add static props to map (plenty of memory left for additional tiles)

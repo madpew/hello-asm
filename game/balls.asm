@@ -1,4 +1,3 @@
-SPRITE_BULLET_START EQU 20
 BALL_SPEED EQU 2
 
 
@@ -8,7 +7,7 @@ SpawnPlayerBall:
     
     ld e, 1     ;mask
     ld bc, 4    ;increaser
-    ld hl, wShadowOam + 4 * SPRITE_BULLET_START
+    ld hl, wBallSprites
 .nextSlot:
     ld a, [hl]
     and a
@@ -42,7 +41,7 @@ SpawnEnemyBall:
     ;set sprite Position & wBallDirection
     ld e, 1     ;mask
     ld bc, 4    ;increaser
-    ld hl, wShadowOam + 4 * SPRITE_BULLET_START
+    ld hl, wBallSprites
 .nextSlot:
     ld a, [hl]
     and a
@@ -77,7 +76,7 @@ UpdateBalls:
     ld d, a
     ld e, 1     ;e ball mask
     ld bc, 4    ;increaser
-    ld hl, wShadowOam + 4 * SPRITE_BULLET_START
+    ld hl, wBallSprites
 
 .nextBall:
     ld a, [hl]
@@ -145,7 +144,7 @@ UpdateBalls:
     ld [hl], 0
 
     call SfxCatch
-    call updateHUDBallStatus
+    call UpdateHUDBallStatus
 
     jr .bottomCheckDone
 .ballHit:
