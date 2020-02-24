@@ -71,6 +71,7 @@ SpawnEnemyBall:
     jr nz, .nextSlot
     ret
 
+; Moves all active balls and checks for collisions/catching
 UpdateBalls:
     ld a, [wBallDirection]
     ld d, a
@@ -81,7 +82,7 @@ UpdateBalls:
 .nextBall:
     ld a, [hl]
     and a
-    jr z, .advanceBall
+    jp z, .advanceBall
     ;check ball direction
     ld a, d
     and e
@@ -99,14 +100,81 @@ UpdateBalls:
 .checkCollisions:
     ;collision check, a = ball Y
 
-    ;check top wall
+; TOP WALL collisions
     cp a, 40
     jr nc, .topCheckPassed
-    xor a
-    ld [hl], a
+    
     call SfxMiss
+    inc hl ;it get's dec'd down  there
+    jp .removeBall
 .topCheckPassed:
 
+; ENEMY COLLISIONS
+    cp a, ENEMY_Y+8
+    jr nc, .skipEnemyCollision
+    cp a, ENEMY_Y
+    jr c, .skipEnemyCollision
+
+    ld a, d ; check if ball is moving down
+    and e
+    jr z, .skipEnemyCollision
+
+    inc hl ; now ballX
+
+; enemy 1 collision check
+    ld a, [wEnemy1X]
+    sub a, 8    
+    cp a, [hl]
+    jr nc, .noEnemy1Collision
+
+    ld a, [wEnemy1X]
+    add a, 16
+    cp a, [hl]
+    jr c, .noEnemy1Collision
+
+    ;enemy 1 collision
+    call PlayerScore
+    jr .removeBall
+.noEnemy1Collision:
+
+; enemy 2 collision check
+;    ld a, [wEnemy2X]
+;    sub a, 8    
+;    cp a, [hl]
+;    jr nc, .noEnemy2Collision
+
+;    ld a, [wEnemy2X]
+;    add a, 16
+;    cp a, [hl]
+;    jr c, .noEnemy2Collision
+
+    ;enemy 2 collision
+;    call PlayerScore
+;    jr .removeBall
+;.noEnemy2Collision:
+
+; enemy 3 collision check
+;    ld a, [wEnemy3X]
+;    sub a, 8    
+;    cp a, [hl]
+;    jr nc, .noEnemy3Collision
+
+;    ld a, [wEnemy3X]
+;    add a, 16
+;    cp a, [hl]
+;    jr c, .noEnemy3Collision
+
+    ;enemy 3 collision
+;    call PlayerScore
+;    jr .removeBall
+;.noEnemy3Collision:
+
+.noEnemyCollision:
+    dec hl
+    jr .advanceBall
+.skipEnemyCollision:
+
+; PLAYER AND BOTTOM COLLISIONS
     ;check bottom collision (player or wall) also catching!
     cp a, PLAYER_Y
     jr c, .bottomCheckPassed
@@ -137,34 +205,28 @@ UpdateBalls:
     ;we're catching and the ball hit the arm
     or PLAYER_HASBALL
     ld [wPlayerFlags], a
-
-    ;clear ball
-    dec hl
-    xor a
-    ld [hl], 0
-
+    
     call SfxCatch
     call UpdateHUDBallStatus
 
-    jr .bottomCheckDone
+    jr .removeBall
 .ballHit:
-    dec hl
-    xor a
-    ld [hl], 0
     call PlayerHit
-    jr .bottomCheckDone
+    jr .removeBall
 .ballMissed:
+    call SfxMiss
+    jr .removeBall
+.bottomCheckPassed:
+
+    ;no collisions so far
+    jr .advanceBall
+.removeBall:
     dec hl
     xor a
     ld [hl], a
-    call SfxMiss
-.bottomCheckDone:
-    ;pop bc
-.bottomCheckPassed:
-    
 .advanceBall:
     add hl, bc
     sla e
-    jr nz, .nextBall
+    jp nz, .nextBall
 
     ret

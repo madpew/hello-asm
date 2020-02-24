@@ -1,22 +1,24 @@
 # Todo
 
 ## Core-Game (3 days)
-- update enemy sprites
-- implement collisions against (static) enemies
-- implement enemy AI and catching
-    1) random spawn enemy wEnemyX (tile alignment) upper and lower nibble
-    1.1) setup wall-sprites according to map
-    1.2) setup cat sprites for enemy 1 or 2
-    2) animate move up
-    3) random shoot or not
-    4) go down after interval, repeat
-    (counters for each enemy for timing)
+
+- implement enemy AI
+- implement Enemy X position randomizer. Align to grid, and check for overlap with other enemies
+- random shoot or not
+- add hit-tiles (x-eyes) and tile-reset on respawn
+- change player sprite to be a lighter shade
 
 ## Optional Features (Wishlist)
+### Phase 1 (likely)
+
+- add static props to map (plenty of memory left for additional tiles)
+- give balls X direction as well so they don't just go straight
+- make catching easier
+
+### Phase 2 (unlikely)
+- add music (custom music format or go with a proven solution)
 - add 2 cloud sprites scrolling along in the background or mouse running across the field
 - make better sounds (layer the channels to get richer effects)
-- add static props to map (plenty of memory left for additional tiles)
-- add music (custom music format or go with a proven solution)
 - add a proper screen transition instead of using the shadow-map refresh as an transition
 
 ## Finish: (1-2 days)
@@ -26,7 +28,6 @@
 - finalize and print cartridge label and gamebox
 - Make photos and finish the article
 
-# Topics for future research
-
-- look into meta-tiles, meta-maps and meta sprites
-- look into 4bit packing for maps (like I used in the GBDK version of PSS)
+# KNOWN BUGS
+- fix enemy collision when state is WAIT
+- fix hit effect cycling BG palette instead of obj0/1

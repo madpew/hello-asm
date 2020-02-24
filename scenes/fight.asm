@@ -48,13 +48,57 @@ LoadFight:
     ld [wEnemy2Timer], a
     ld [wEnemy2State], a
 
+    ld [wEnemy3X], a
+    ld [wEnemy3Y], a
+    ld [wEnemy3Timer], a
+    ld [wEnemy3State], a
+
     set_sprite_addr wSpritePlayerLeft, PLAYER_Y, 100, TILEIDX_PLAYERLEFT, 0
     set_sprite_addr wSpritePlayerRight, PLAYER_Y, 100+8, TILEIDX_PLAYERRIGHT, 0
     set_sprite_addr wSpritePlayerPawRight, 144+16, 100+16, TILEIDX_PAWRIGHT, 0
     set_sprite_addr wSpritePlayerPawLeft, 144+16, 100-8, TILEIDX_PAWLEFT, 0
     set_sprite_addr wSpritePlayerBall, 144+16, 100+16+2, TILEIDX_BALL, 0
 
+
+    set_sprite_addr wEnemySprites,      ENEMY_Y + 8, 64, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 4,  ENEMY_Y + 8, 64+8, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 8,  ENEMY_Y +4, 64, TILEIDX_FACELEFTUP, 0
+    set_sprite_addr wEnemySprites + 12, ENEMY_Y +4, 64+8, TILEIDX_FACERIGHTUP, 0
+    set_sprite_addr wEnemySprites + 16, ENEMY_Y, 64+16, TILEIDX_PAWRIGHT, 0
+    
+    set_sprite_addr wEnemySprites + 20, ENEMY_Y + 8, 92, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 24, ENEMY_Y + 8, 92+8, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 28, ENEMY_Y+7, 92, TILEIDX_FACELEFTUP, 0
+    set_sprite_addr wEnemySprites + 32, ENEMY_Y+7, 92+8, TILEIDX_FACERIGHTUP, 0
+    set_sprite_addr wEnemySprites + 36, ENEMY_Y, 92+16, TILEIDX_PAWRIGHT, 0
+
+    set_sprite_addr wEnemySprites + 40, ENEMY_Y + 8, 92, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 44, ENEMY_Y + 8, 92+8, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 48, ENEMY_Y+7, 92, TILEIDX_FACELEFTUP, 0
+    set_sprite_addr wEnemySprites + 52, ENEMY_Y+7, 92+8, TILEIDX_FACERIGHTUP, 0
+    set_sprite_addr wEnemySprites + 56, ENEMY_Y, 92+16, TILEIDX_PAWRIGHT, 0
+
+;debug setup enemies
+;    ld a, 8*8
+;    ld [wEnemy1X], a
+;    ld a, 14*8
+;    ld [wEnemy2X], a
+;    ld a, 3*8
+;    ld [wEnemy3X], a
+;    ld a, ENEMY_Y
+;    ld [wEnemy1Y], a
+;   ld [wEnemy2Y], a
+;    ld [wEnemy3Y], a
+
+    call GetNextRandom
+    ld a, 1 ;debug
+    ld [wEnemy1Timer], a
+    call GetNextRandom
+    ld [wEnemy2Timer], a
+    call GetNextRandom
+    ld [wEnemy3Timer], a
 	ret
+
 
 ; entry point each frame
 ; do vblank stuff first
@@ -78,10 +122,77 @@ TickFight:
     ld [hl], a
 
 ; update enemy sprites
-;2x face
-;2x wall tile
+    ; update X positions
+    ld a, [wEnemy1X]
+    ld [wEnemySprites + 1], a
+    ld [wEnemySprites + 8 + 1], a
+    add a, 8
+    ld [wEnemySprites + 1 + 4], a
+    ld [wEnemySprites + 12 + 1], a
+    add a, 8
+    ld [wEnemySprites + 16 + 1], a
+
+    ; update Y positions
+    xor a
+    ld [wEnemySprites + 16], a ;make arm invisible
+    ld a, [wEnemy1State]
+    cp ENEMY_STATE_THROW
+    ld a, [wEnemy1Y]
+    jr nz, .noEnemy1Arm
+    ld [wEnemySprites + 16], a ;make arm visible
+.noEnemy1Arm:
+    ld [wEnemySprites + 8], a
+    ld [wEnemySprites + 12], a
 
 
+    ; update X positions
+    ld a, [wEnemy2X]
+    ld [wEnemySprites + 20 + 1], a
+    ld [wEnemySprites + 20 + 8 + 1], a
+    add a, 8
+    ld [wEnemySprites + 20 + 1 + 4], a
+    ld [wEnemySprites + 20 + 12 + 1], a
+    add a, 8
+    ld [wEnemySprites + 20 + 16 + 1], a
+
+    ; update Y positions
+    xor a
+    ld [wEnemySprites + 20 + 16], a ;make arm invisible
+    ld a, [wEnemy2State]
+    cp ENEMY_STATE_THROW
+    ld a, [wEnemy2Y]
+    jr nz, .noEnemy2Arm
+    ld [wEnemySprites + 20 + 16], a ;make arm visible
+.noEnemy2Arm:
+    ld [wEnemySprites + 20 + 8], a
+    ld [wEnemySprites + 20 + 12], a
+
+
+
+    ; update X positions
+    ld a, [wEnemy3X]
+    ld [wEnemySprites + 40 + 1], a
+    ld [wEnemySprites + 40 + 8 + 1], a
+    add a, 8
+    ld [wEnemySprites + 40 + 1 + 4], a
+    ld [wEnemySprites + 40 + 12 + 1], a
+    add a, 8
+    ld [wEnemySprites + 40 + 16 + 1], a
+
+    ; update Y positions
+    xor a
+    ld [wEnemySprites + 40 + 16], a ;make arm invisible
+    ld a, [wEnemy3State]
+    cp ENEMY_STATE_THROW
+    ld a, [wEnemy3Y]
+    jr nz, .noEnemy3Arm
+    ld [wEnemySprites + 40 + 16], a ;make arm visible
+.noEnemy3Arm:
+    ld [wEnemySprites + 40 + 8], a
+    ld [wEnemySprites + 40 + 12], a
+;end of enemy sprites
+
+  
 ; reset player flags
     ld a, [wFrames]
     and %00000011
@@ -168,7 +279,7 @@ TickFight:
 
 
 ; debug input handling    
-IF DEBUG
+;IF DEBUG
 
     is_key_pressed KEY_START
     jr z, .noStart
@@ -178,7 +289,7 @@ IF DEBUG
     call SpawnEnemyBall
 .noStart:    
 
-ENDC
+;ENDC
 
 
 ; skip player input if we're hit
@@ -228,9 +339,9 @@ ENDC
     is_key_held KEY_LEFT
     jr z, .noLeft
     ld a, [wPlayerX]
-    cp a, 16
-    jr z, .noLeft
     sub a, b
+    cp a, 16
+    jr c, .noLeft
     ld [wPlayerX], a
 .noLeft:    
 
@@ -238,9 +349,9 @@ ENDC
     is_key_held KEY_RIGHT
     jr z, .noRight
     ld a, [wPlayerX]
-    cp a, 160-16
-    jr z, .noRight
     add a, b
+    cp a, 160-16
+    jr nc, .noRight
     ld [wPlayerX], a
 .noRight:  
 
@@ -287,6 +398,11 @@ ENDC
 
 ; Updates the player score
 PlayerScore:
+    push af
+    push bc
+    push de
+    push hl
+
     ;increase score
     ld a, [wScoreLowBcd]
     add a, 4 ;debug add 4 each click
@@ -302,6 +418,13 @@ PlayerScore:
     ;update score-display
     ld hl, wShadowMap + 32*17 + 16
 	call PrintScore
+    call SfxHit
+    
+    pop hl
+    pop de
+    pop bc
+    pop af
+    
     ret
 
 ; Player got hit by a bullet. Reduce Lives, update HUD, play sound and check for GameOver
@@ -335,6 +458,8 @@ PlayerHit:
 
 ;call on catch or throw, inline
 UpdateHUDBallStatus:
+    push hl
+    push bc
     ld b, TILEIDX_ENERGY
     ld a, [wPlayerFlags]
     and PLAYER_HASBALL
@@ -344,6 +469,8 @@ UpdateHUDBallStatus:
     ld hl, wShadowMap + 32*17 + 10
     ld [hl], b
 
+    pop bc
+    pop hl
     ret
 
 ;Animates the grass

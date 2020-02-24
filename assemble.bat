@@ -19,7 +19,8 @@ if errorlevel 1 goto cleanup
 echo Compilation step 3/4: Fixing...
 rgbfix -v -p 0x00 %name%.gb
 
-start bgb %name%.gb
+REM start bgb %name%.gb
+REM use "bgb -watch" instead, it monitors the rom and auto-reloads keeping all breakpoints etc.
 
 :cleanup
 echo Compilation step 4/4: Cleaning up...

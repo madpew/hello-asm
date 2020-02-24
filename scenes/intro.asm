@@ -21,6 +21,9 @@ LoadIntro:
 ; do vblank stuff first
 TickIntro:
 
+	; cycle the LFSR to "seed"
+	call GetNextRandom
+
 	; START the game
 	is_key_pressed KEY_START
 	jr z, .noSwitchGame
@@ -71,13 +74,13 @@ AnimateMap:
 	jr .checkNext
 .animate:
 	ld a, [hl]
-	cp a, 50
+	cp a, TILEIDX_PAWLEFT
 	jr nz, .check51
 	inc a
 	ld [hl], a
 	jr .checkNext
 .check51	
-	cp a, 51
+	cp a, TILEIDX_PAWRIGHT
 	jr nz, .checkNext
 	dec a
 	ld [hl], a

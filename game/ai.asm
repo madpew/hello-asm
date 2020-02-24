@@ -12,10 +12,13 @@ UpdateAI:
 
     call ProcessEnemy   ; first
 
-    ld bc, 4 ;size of enemy struct
-    add hl, bc
+    ;ld bc, 4 ;size of enemy struct
+    ;add hl, bc
+    ;call ProcessEnemy   ; second
 
-    call ProcessEnemy   ; second
+    ;ld bc, 4 ;size of enemy struct
+    ;add hl, bc
+    ;call ProcessEnemy   ; third
 
     ret
 
@@ -25,18 +28,21 @@ ProcessEnemy:
 
     ; enemy AI is based on a very basic statemachine and a timer
     ; when the timer hits 0, the statemachine acts accordingly, sets the new state and timer
+    ld a, [hl]
+    and a
+    jr z, .noDecreaseTime
     dec [hl]
-    jr nz, .sleep
+.noDecreaseTime:
 
     inc hl
-    ld a, [hld] ;load state, hl now points to timer again
+    ld a, [hl] ;load state, hl now points to timer again
+    dec hl
     ld c, a    
     sla c		; shift c left (*2) because our table contains 16bit addresses
 
     ld b, 0
-	
-	lookup_jump StateFuncTable	; do the table jump using the given Table (label) and offset stored in BC
-.sleep:
+    lookup_jump StateFuncTable	; do the table jump using the given Table (label) and offset stored in BC
+.done:
     pop hl
     ret
 
@@ -46,23 +52,24 @@ ProcessEnemy:
 
 ENEMY_TIME_AIM  equ 60
 
-ENEMY_STATE_WAIT equ    1   ;turn off sprites, set timer to random interval, set random x
-ENEMY_STATE_UP  equ     2   ; move enemy up
-ENEMY_STATE_AIM equ     3   ; wait 
-ENEMY_STATE_THROW equ   4   ; shoot or don't and wait
-ENEMY_STATE_HIT equ     5   ; hit animation
-ENEMY_STATE_DOWN equ    6   ; move down
+ENEMY_STATE_WAIT equ    0   ;turn off sprites, set timer to random interval, set random x
+ENEMY_STATE_UP  equ     1   ; move enemy up
+ENEMY_STATE_AIM equ     2   ; wait 
+ENEMY_STATE_THROW equ   3   ; shoot or don't and wait
+ENEMY_STATE_HIT equ     4   ; hit animation
+ENEMY_STATE_DOWN equ    5   ; move down
 
 AIStateWait:
-jr ProcessEnemy.sleep
+    pop hl
+    push hl
+    ;hl points at timer
+    ld a, [hli]
+    and a
+    jr nz, ProcessEnemy.done ;keep waiting 
 
-ret
-    ; set sleep time
-    xor a
-    ld [hli], a
-
-    ; advance state
-    sla [hl]
+    ;set next state
+    ld a, ENEMY_STATE_UP
+    ld [hl], a
 
     ; update EnemyX
     inc hl
@@ -70,17 +77,18 @@ ret
     sla a ; *8 to align with tiles
     sla a
     sla a
-    and a, 7 ; always set low 8 bits
+    or a, 7 ; always set low 8 bits
     ld [hli], a
     ; set EnemyY
-    ld a, ENEMY_Y
-    add a, 8
+    ld a, ENEMY_Y + 4 
     ld [hl], a
-ret 
+    ; todo: also reset sprite tiles
+
+    jr ProcessEnemy.done
 
 AIStateUp:
-ret 
-
+    pop hl
+    push hl
     ; sleeptime can stay at 0 (for fast scrolling)
     ld bc, 3
     add hl, bc
@@ -95,26 +103,61 @@ ret
 
     ;advance state
     dec hl
-    sla [hl]
+    ld a, ENEMY_STATE_AIM
+    ld [hl], a
+
     dec hl
     ld a, ENEMY_TIME_AIM
     ld [hl], a
 .continue:
-    ret
+    jr ProcessEnemy.done
 
 AIStateAim:
+    pop hl
+    push hl
+
+    ;hl points at timer
+    ld a, [hli]
+    and a
+    jr nz, ProcessEnemy.done ;keep waiting 
+
+    ;aiming is done
+    ;call GetNextRandom
+    ;and %01010101
+    ld a, ENEMY_STATE_DOWN
+    ld [hl], a
+
+    jr ProcessEnemy.done
+
 AIStateThrow:
 AIStateHit:
-ret
+    pop hl
+    push hl
+    jr ProcessEnemy.done
 
 AIStateDown:
-ret
-    ; once down is finished, set wait time to random + state to wait
-    ; set sleep time
-    call GetNextRandom
-    ld [hli], a
+    pop hl
+    push hl
+    ; sleeptime can stay at 0 (for fast scrolling)
+    ld bc, 3
+    add hl, bc
 
-    ; advance state
+    ; now points at enemyY
+    ; move up
+    ld a, [hl]
+    inc a
+    ld [hld], a
+    cp a, ENEMY_Y + 8
+    jr nz, .continue
+
+    ;advance state
+    dec hl
     ld a, ENEMY_STATE_WAIT
     ld [hl], a
-    ret
+
+    dec hl
+    call GetNextRandom
+    ;ld a, ENEMY_TIME_AIM
+    ld [hl], a
+.continue:
+    jr ProcessEnemy.done
