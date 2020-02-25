@@ -3,7 +3,7 @@ A barebones example that goes beyond the usual Hello-World for the original Game
 
 It is a very basic but complete game. 
 
-![catgame_title](https://github.com/madpew/hello-asm/catgame_title.gif)![catgame_game](https://github.com/madpew/hello-asm/catgame_game.gif)
+![catgame_title](https://github.com/madpew/hello-asm/blob/master/catgame_title.gif)![catgame_game](https://github.com/madpew/hello-asm/blob/master/catgame_game.gif)
 
 
 
