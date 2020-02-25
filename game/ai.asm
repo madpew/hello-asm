@@ -10,15 +10,18 @@ UpdateAI:
 
     ld hl, wEnemyData
 
+    ld de, wEnemy1Sprites 
     call ProcessEnemy   ; first
 
-    ;ld bc, 4 ;size of enemy struct
-    ;add hl, bc
-    ;call ProcessEnemy   ; second
+    ld bc, 4 ;size of enemy struct
+    add hl, bc
+    ld de, wEnemy2Sprites 
+    call ProcessEnemy   ; second
 
-    ;ld bc, 4 ;size of enemy struct
-    ;add hl, bc
-    ;call ProcessEnemy   ; third
+    ld bc, 4 ;size of enemy struct
+    add hl, bc
+    ld de, wEnemy3Sprites 
+    call ProcessEnemy   ; third
 
     ret
 
@@ -49,16 +52,6 @@ ProcessEnemy:
 ; AI State Machine
 ; Functions get called with hl pointing to the timer when the timer reached zero (the state is completed or changed)
 ; Functions need to set the timer and state
-
-ENEMY_TIME_AIM  equ 60
-
-ENEMY_STATE_WAIT equ    0   ;turn off sprites, set timer to random interval, set random x
-ENEMY_STATE_UP  equ     1   ; move enemy up
-ENEMY_STATE_AIM equ     2   ; wait 
-ENEMY_STATE_THROW equ   3   ; shoot or don't and wait
-ENEMY_STATE_HIT equ     4   ; hit animation
-ENEMY_STATE_DOWN equ    5   ; move down
-
 AIStateWait:
     pop hl
     push hl
@@ -73,17 +66,34 @@ AIStateWait:
 
     ; update EnemyX
     inc hl
-    call GetNextRandom
-    and $1f
-    sla a ; *8 to align with tiles
-    sla a
-    sla a
-    add a, 8 ; add 7 for the offset
+    
+    call GetSpawnX
+
     ld [hli], a
     ; set EnemyY
     ld a, ENEMY_Y + 4 
     ld [hl], a
-    ; todo: also reset sprite tiles
+
+    ;reset sprites
+    ld h, d
+    ld l, e
+    ld de, 2
+    add hl, de ;now pointing to tileid-field of first sprite (wall)
+    ld de, 4
+    add hl, de  ;second wall sprite
+    add hl, de  ; first face sprite
+    ld a, TILEIDX_FACELEFTUP
+    ld [hl], a
+    add hl, de
+    ld a, TILEIDX_FACERIGHTUP
+    ld [hli], a
+    inc hl  ;turn off arm sprite
+    xor a
+    ld [hl], a
+    inc hl
+    inc hl
+    ld a, TILEIDX_PAWBALL
+    ld [hl], a
 
     jr ProcessEnemy.done
 
@@ -118,27 +128,143 @@ AIStateAim:
     push hl
 
     ;hl points at timer
-    ld a, [hli]
+    ld a, [hl]
     and a
     jr nz, ProcessEnemy.done ;keep waiting 
 
+
     ;aiming is done
-    ;call GetNextRandom
-    ;and %01010101
-    ld a, ENEMY_STATE_DOWN
+    ld a, ENEMY_TIME_THROW
     ld [hl], a
 
+    call GetNextRandom
+    and %00001001
+    ld a, ENEMY_STATE_THROW
+    jr nz, .throw
+    ld a, ENEMY_STATE_DOWN
+.throw:
+    inc hl
+    ld [hl], a
     jr ProcessEnemy.done
 
 AIStateThrow:
+    pop hl
+    push hl
+
+    ;set paw sprite to enemy y while throwing
+    ld h, d
+    ld l, e
+    ld bc, 16
+    add hl, bc
+
+    ld a, ENEMY_Y 
+    ld [hl], a
+
+    pop hl
+    push hl
+
+    ;check timer if we should advance
+    ld a, [hl]
+    and a
+    jr nz, ProcessEnemy.done
+
+    ld h, d
+    ld l, e
+    ld bc, 18
+    add hl, bc
+
+    ld a, TILEIDX_PAWRIGHT
+    ld [hl], a
+
+    pop hl
+    push hl
+
+    ld a, ENEMY_TIME_THROW
+    ld [hl], a
+
+    inc hl
+    ld a, ENEMY_STATE_DOWN
+    ld [hli], a
+    ld a, [hl] ;enemyX
+    ld d, a
+
+    call SpawnEnemyBall
+
+    jp ProcessEnemy.done
+
+;same as "Down", but slower animation + changed tiles
 AIStateHit:
     pop hl
     push hl
-    jr ProcessEnemy.done
+
+    ;set sprites
+    ld h, d
+    ld l, e
+    ld de, 2
+    add hl, de ;now pointing to tileid-field of first sprite (wall)
+    ld de, 4
+    add hl, de  ;second wall sprite
+    add hl, de  ; first face sprite
+    ld a, TILEIDX_FACELEFTX
+    ld [hl], a
+    add hl, de
+    ld a, TILEIDX_FACERIGHTX
+    ld [hli], a ;hli to skip the obj-flags
+    inc hl ; advance to next sprite (paw)
+    xor a
+    ld [hl], a ; disable sprite since we were hit
+
+    pop hl
+    push hl
+    ; sleeptime can stay at 0 (for fast scrolling)
+    ld bc, 3
+    add hl, bc
+
+    ; now points at enemyY
+    ; move up
+    ld a, [wFrames]
+    and %00000111
+    jr nz, .continue
+
+    ld a, [hl]
+    inc a
+    ld [hld], a
+    cp a, ENEMY_Y + 8
+    jr nz, .continue
+
+    ;advance state
+    dec hl
+    ld a, ENEMY_STATE_WAIT
+    ld [hl], a
+
+    dec hl
+    call GetNextRandom
+    res 7, a
+    ld [hl], a
+.continue:
+    jp ProcessEnemy.done
 
 AIStateDown:
     pop hl
     push hl
+
+    ;check timer if we should advance
+    ld a, [hl]
+    and a
+    jp nz, ProcessEnemy.done
+
+    ;set paw sprite to enemy y while throwing
+    ld h, d
+    ld l, e
+    ld bc, 16
+    add hl, bc
+
+    xor a
+    ld [hl], a
+
+    pop hl
+    push hl
+
     ; sleeptime can stay at 0 (for fast scrolling)
     ld bc, 3
     add hl, bc
@@ -161,4 +287,70 @@ AIStateDown:
     res 7, a
     ld [hl], a
 .continue:
-    jr ProcessEnemy.done
+    jp ProcessEnemy.done
+
+
+GetSpawnX:
+    push bc
+    push de
+
+.takeAGuess:
+    call GetNextRandom
+    and $0f ;0-15
+    add a, 2 ; 2 tiles + offscreen
+    sla a ; *8 to align with tiles
+    sla a
+    sla a
+    
+    ld d, a ;move it to d
+
+    ; check new X(left) against existing enemy-locations
+    ld a, [wEnemy1X]
+    ld b, a
+    add a, 16
+    ld c, a
+    ld a, d
+    ;a = newX, b = enemy1x, c = enemy1x + 24
+    cp a, c
+    jr nc, .check1passed
+    add a, 16
+    cp a, b
+    jr c, .check1passed
+    jr .takeAGuess
+.check1passed:   
+
+    ld a, [wEnemy2X]
+    ld b, a
+    add a, 16
+    ld c, a
+    ld a, d
+    ;d = newX, b = enemy1x, c = enemy1x + 15
+    cp a, c
+    jr nc, .check2passed
+    add a, 16
+    cp a, b
+    jr c, .check2passed
+    jr .takeAGuess
+.check2passed:   
+
+    ld a, [wEnemy3X]
+    ld b, a
+    add a, 16
+    ld c, a
+    ld a, d
+    ;d = newX, b = enemy1x, c = enemy1x + 15
+    cp a, c
+    jr nc, .check3passed
+    add a, 16
+    cp a, b
+    jr c, .check3passed
+    jr .takeAGuess
+.check3passed:   
+
+    ld a, d
+
+    ;result is ok!
+    pop de
+    pop bc
+
+    ret

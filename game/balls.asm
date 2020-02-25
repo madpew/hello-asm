@@ -1,6 +1,3 @@
-BALL_SPEED EQU 2
-
-
 SpawnPlayerBall:
     ;find free ball-sprite slot
     ;set sprite Position & wBallDirection
@@ -122,10 +119,10 @@ UpdateBalls:
     inc hl ; now ballX
 
 ; enemy 1 collision check
-    ld a, [wEnemy1State]
-    and a
-    jr z, .noEnemy1Collision
-
+    ld a, [wEnemy1Y]
+    cp ENEMY_Y
+    jr nz, .noEnemy1Collision
+    
     ld a, [wEnemy1X]
     sub a, 8    
     cp a, [hl]
@@ -135,14 +132,67 @@ UpdateBalls:
     add a, 16
     cp a, [hl]
     jr c, .noEnemy1Collision
-
+    
     ;enemy 1 collision
+    ld a, ENEMY_STATE_HIT
+    ld [wEnemy1State], a
+    xor a
+    ld [wEnemy1Timer], a
+    
     call PlayerScore
-    jr .removeBall
+    jp .removeBall
 .noEnemy1Collision:
 
 ;todo: repeat for other enemies
+; enemy 2 collision check
+    ld a, [wEnemy2Y]
+    cp ENEMY_Y
+    jr nz, .noEnemy2Collision
+    
+    ld a, [wEnemy2X]
+    sub a, 8    
+    cp a, [hl]
+    jr nc, .noEnemy2Collision
 
+    ld a, [wEnemy2X]
+    add a, 16
+    cp a, [hl]
+    jr c, .noEnemy2Collision
+    
+    ;enemy 2 collision
+    ld a, ENEMY_STATE_HIT
+    ld [wEnemy2State], a
+    xor a
+    ld [wEnemy2Timer], a
+    
+    call PlayerScore
+    jr .removeBall
+.noEnemy2Collision:
+
+; enemy 3 collision check
+    ld a, [wEnemy3Y]
+    cp ENEMY_Y
+    jr nz, .noEnemy3Collision
+    
+    ld a, [wEnemy3X]
+    sub a, 8    
+    cp a, [hl]
+    jr nc, .noEnemy3Collision
+
+    ld a, [wEnemy3X]
+    add a, 16
+    cp a, [hl]
+    jr c, .noEnemy3Collision
+    
+    ;enemy 1 collision
+    ld a, ENEMY_STATE_HIT
+    ld [wEnemy3State], a
+    xor a
+    ld [wEnemy3Timer], a
+    
+    call PlayerScore
+    jr .removeBall
+.noEnemy3Collision:
 
 .noEnemyCollision:
     dec hl

@@ -1,14 +1,3 @@
-PLAYER_Y EQU 120+16
-ENEMY_Y EQU 16+40
-
-SPRITE_ARM EQU      2
-SPRITE_ARM2 EQU     3
-
-PLAYER_HIT EQU      %00000001
-PLAYER_HASBALL EQU  %00000010
-PLAYER_CATCH EQU    %00000100
-PLAYER_THROWING EQU %00001000
-
 include "game/balls.asm"
 include "game/ai.asm"
 
@@ -40,62 +29,49 @@ LoadFight:
 
     ld [wEnemy1X], a
     ld [wEnemy1Y], a
-    ld [wEnemy1Timer], a
     ld [wEnemy1State], a
 
     ld [wEnemy2X], a
     ld [wEnemy2Y], a
-    ld [wEnemy2Timer], a
     ld [wEnemy2State], a
 
     ld [wEnemy3X], a
     ld [wEnemy3Y], a
-    ld [wEnemy3Timer], a
     ld [wEnemy3State], a
 
     set_sprite_addr wSpritePlayerLeft, PLAYER_Y, 100, TILEIDX_PLAYERLEFT, 0
     set_sprite_addr wSpritePlayerRight, PLAYER_Y, 100+8, TILEIDX_PLAYERRIGHT, 0
-    set_sprite_addr wSpritePlayerPawRight, 144+16, 100+16, TILEIDX_PAWRIGHT, 0
+    set_sprite_addr wSpritePlayerPawRight, 144+16, 100+16, TILEIDX_PLAYERPAWRIGHT, 0
     set_sprite_addr wSpritePlayerPawLeft, 144+16, 100-8, TILEIDX_PAWLEFT, 0
     set_sprite_addr wSpritePlayerBall, 144+16, 100+16+2, TILEIDX_BALL, 0
 
-
-    set_sprite_addr wEnemySprites,      ENEMY_Y + 8, 64, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 4,  ENEMY_Y + 8, 64+8, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 8,  ENEMY_Y +4, 64, TILEIDX_FACELEFTUP, 0
-    set_sprite_addr wEnemySprites + 12, ENEMY_Y +4, 64+8, TILEIDX_FACERIGHTUP, 0
-    set_sprite_addr wEnemySprites + 16, ENEMY_Y, 64+16, TILEIDX_PAWRIGHT, 0
+    set_sprite_addr wEnemySprites,      ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 4,  ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 8,  ENEMY_Y +4, 0, TILEIDX_FACELEFTUP, 0
+    set_sprite_addr wEnemySprites + 12, ENEMY_Y +4, 0, TILEIDX_FACERIGHTUP, 0
+    set_sprite_addr wEnemySprites + 16, 0, 0, TILEIDX_PAWBALL, 0
     
-    set_sprite_addr wEnemySprites + 20, ENEMY_Y + 8, 92, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 24, ENEMY_Y + 8, 92+8, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 28, ENEMY_Y+7, 92, TILEIDX_FACELEFTUP, 0
-    set_sprite_addr wEnemySprites + 32, ENEMY_Y+7, 92+8, TILEIDX_FACERIGHTUP, 0
-    set_sprite_addr wEnemySprites + 36, ENEMY_Y, 92+16, TILEIDX_PAWRIGHT, 0
+    set_sprite_addr wEnemySprites + 20, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 24, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 28, ENEMY_Y+7, 0, TILEIDX_FACELEFTUP, 0
+    set_sprite_addr wEnemySprites + 32, ENEMY_Y+7, 0, TILEIDX_FACERIGHTUP, 0
+    set_sprite_addr wEnemySprites + 36, 0, 0, TILEIDX_PAWBALL, 0
 
-    set_sprite_addr wEnemySprites + 40, ENEMY_Y + 8, 92, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 44, ENEMY_Y + 8, 92+8, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 48, ENEMY_Y+7, 92, TILEIDX_FACELEFTUP, 0
-    set_sprite_addr wEnemySprites + 52, ENEMY_Y+7, 92+8, TILEIDX_FACERIGHTUP, 0
-    set_sprite_addr wEnemySprites + 56, ENEMY_Y, 92+16, TILEIDX_PAWRIGHT, 0
+    set_sprite_addr wEnemySprites + 40, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 44, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 48, ENEMY_Y+7, 0, TILEIDX_FACELEFTUP, 0
+    set_sprite_addr wEnemySprites + 52, ENEMY_Y+7, 0, TILEIDX_FACERIGHTUP, 0
+    set_sprite_addr wEnemySprites + 56, 0, 0, TILEIDX_PAWBALL, 0
 
-;debug setup enemies
-;    ld a, 8*8
-;    ld [wEnemy1X], a
-;    ld a, 14*8
-;    ld [wEnemy2X], a
-;    ld a, 3*8
-;    ld [wEnemy3X], a
-;    ld a, ENEMY_Y
-;    ld [wEnemy1Y], a
-;   ld [wEnemy2Y], a
-;    ld [wEnemy3Y], a
 
     call GetNextRandom
-    ld a, 1 ;debug
+    and %00111111
     ld [wEnemy1Timer], a
     call GetNextRandom
+    and %00111111
     ld [wEnemy2Timer], a
     call GetNextRandom
+    and %00111111
     ld [wEnemy3Timer], a
 	ret
 
@@ -133,14 +109,7 @@ TickFight:
     ld [wEnemySprites + 16 + 1], a
 
     ; update Y positions
-    xor a
-    ld [wEnemySprites + 16], a ;make arm invisible
-    ld a, [wEnemy1State]
-    cp ENEMY_STATE_THROW
     ld a, [wEnemy1Y]
-    jr nz, .noEnemy1Arm
-    ld [wEnemySprites + 16], a ;make arm visible
-.noEnemy1Arm:
     ld [wEnemySprites + 8], a
     ld [wEnemySprites + 12], a
 
@@ -224,8 +193,9 @@ TickFight:
 
     ;counter just reached 0
     ;reset palette
-    ld a, [wPaletteObj0]
+    ld a, [wPaletteObj1]
     ld [wPaletteBg], a
+    ld [wPaletteObj0], a
 
     ;clear flag
     ld a, [wPlayerFlags]
@@ -246,6 +216,7 @@ TickFight:
     ld a, [wPaletteBg]
     xor a, $ff ;something else here
     ld [wPaletteBg], a
+    ld [wPaletteObj0], a
 .noHitEffect:    
 
 ; update timer
@@ -338,6 +309,7 @@ TickFight:
 ; Input - Move Left
     is_key_held KEY_LEFT
     jr z, .noLeft
+    call GetNextRandom
     ld a, [wPlayerX]
     sub a, b
     cp a, 16
@@ -348,6 +320,7 @@ TickFight:
 ; Input - Move Right
     is_key_held KEY_RIGHT
     jr z, .noRight
+    call GetNextRandom
     ld a, [wPlayerX]
     add a, b
     cp a, 160-16

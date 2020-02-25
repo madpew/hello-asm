@@ -11,23 +11,20 @@ wSpritePlayerBall: ds 4
 wBallSprites: ds 8*4
 
 wEnemySprites:
-sprite23: ds 4
-sprite24: ds 4
-sprite25: ds 4
-sprite26: ds 4
-sprite27: ds 4
+wEnemy1Sprites:
+wEnemy1WallSprites: ds 8
+wEnemy1FaceSprites: ds 8
+wEnemy1PawSprite: ds 4
+
 wEnemy2Sprites:
-sprite28: ds 4
-sprite29: ds 4
-sprite30: ds 4
-sprite31: ds 4
-sprite32: ds 4
+wEnemy2WallSprites: ds 8
+wEnemy2FaceSprites: ds 8
+wEnemy2PawSprite: ds 4
+
 wEnemy3Sprites:
-sprite6: ds 4
-sprite7: ds 4
-sprite8: ds 4
-sprite9: ds 4
-sprite10: ds 4
+wEnemy3WallSprites: ds 8
+wEnemy3FaceSprites: ds 8
+wEnemy3PawSprite: ds 4
 
 FreeSprites_12:
 sprite11: ds 4

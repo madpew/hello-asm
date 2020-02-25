@@ -8,6 +8,21 @@ ShadowMap:
 General:
     Optimize calls by using RST Vectors: e.g. put "jp hl" at offset $8 and  use "rst $8" instead of "call _hl"
 
+
+# Topics for future research
+
+- look into meta-tiles, meta-maps and meta sprites
+- look into 4bit packing for maps (like I used in the GBDK version of PSS)
+
+# topics for article
+
+### Unexpected Rendering Problem:
+Sprite Priority doesn't work how I anticipated. Thus some parts of the code should probably be done differently.
+(Especially the whole "wall tile below cats" thing).
+Sprites are sorted by: Y Coordinate > X Coordinate > OAM-Index
+Priority is just "over write BG" or "only overwrite white background" instead of OAM-Priority.
+
+### remembering cp flags
 CP A, X
 c: A < X
 nc: A > X
@@ -15,13 +30,4 @@ nc: A > X
 LESS EQUS "c"
 GREATER EQUS "nc"
 
-# Topics for future research
-
-- look into meta-tiles, meta-maps and meta sprites
-- look into 4bit packing for maps (like I used in the GBDK version of PSS)
-
-# Unexpected Rendering Problem:
-Sprite Priority doesn't work how I anticipated. Thus some parts of the code should probably be done differently.
-(Especially the whole "wall tile below cats" thing).
-Sprites are sorted by: Y Coordinate > X Coordinate > OAM-Index
-Priority is just "over write BG" or "only overwrite white background" instead of OAM-Priority.
+c like "smaller"

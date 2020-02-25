@@ -14,7 +14,7 @@
                 "cwd": "${workspaceFolder}"
             },
             "command": "${cwd}\\assemble.bat",
-            "problemMatcher": []
+            "problemMatcher": ["$rgbdserror", "$rgbdslinkerror"]
         },
         {
             "label": "run",
@@ -23,7 +23,7 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "command": "bgb ${cwd}\\*.gb",
+            "command": "bgb -watch ${cwd}\\*.gb",
             "problemMatcher": []
         }
     ]

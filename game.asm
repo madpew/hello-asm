@@ -8,6 +8,8 @@ SCENE_WIN EQU 3
 SCENE_LOST EQU 4
 SCENE_HELP EQU 5
 
+include "game/defs.asm"
+
 include "scenes/logo.asm"
 include "scenes/intro.asm"
 include "scenes/fight.asm"
