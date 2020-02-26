@@ -372,13 +372,12 @@ TickFight:
 ; Updates the player score
 PlayerScore:
     push af
-    push bc
     push de
     push hl
 
     ;increase score
     ld a, [wScoreLowBcd]
-    add a, 4 ;debug add 4 each click
+    add a, b
     daa
     ld [wScoreLowBcd], a
     ld b, a
@@ -395,7 +394,6 @@ PlayerScore:
     
     pop hl
     pop de
-    pop bc
     pop af
     
     ret

@@ -6,7 +6,7 @@ include "macros.inc"
 include "ram.asm"
 include "interrupts.asm"
 
-DEBUG EQU 0
+DEBUG EQU 1
 
 ;--------------------------------------------------------------------------------------------
 SECTION	"BOOT", ROM0[$0100]

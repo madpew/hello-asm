@@ -108,13 +108,13 @@ UpdateBalls:
 
 ; ENEMY COLLISIONS
     cp a, ENEMY_Y+8
-    jr nc, .skipEnemyCollision
+    jp nc, .skipEnemyCollision
     cp a, ENEMY_Y
-    jr c, .skipEnemyCollision
+    jp c, .skipEnemyCollision
 
     ld a, d ; check if ball is moving down
     and e
-    jr z, .skipEnemyCollision
+    jp z, .skipEnemyCollision
 
     inc hl ; now ballX
 
@@ -134,12 +134,24 @@ UpdateBalls:
     jr c, .noEnemy1Collision
     
     ;enemy 1 collision
+    push bc
+    ld b, SCORE_SMALL
+
+    ld a, [wEnemy1State]
+    cp a, ENEMY_STATE_DOWN
+    jr nz, .lowScore1
+    ld b, SCORE_BIG
+.lowScore1:
+    call PlayerScore
+
+    pop bc
+
     ld a, ENEMY_STATE_HIT
     ld [wEnemy1State], a
     xor a
     ld [wEnemy1Timer], a
     
-    call PlayerScore
+
     jp .removeBall
 .noEnemy1Collision:
 
@@ -160,12 +172,23 @@ UpdateBalls:
     jr c, .noEnemy2Collision
     
     ;enemy 2 collision
+    push bc
+    ld b, SCORE_SMALL
+
+    ld a, [wEnemy2State]
+    cp a, ENEMY_STATE_DOWN
+    jr nz, .lowScore2
+    ld b, SCORE_BIG
+.lowScore2:
+    call PlayerScore
+
+    pop bc
+
     ld a, ENEMY_STATE_HIT
     ld [wEnemy2State], a
     xor a
     ld [wEnemy2Timer], a
     
-    call PlayerScore
     jr .removeBall
 .noEnemy2Collision:
 
@@ -184,13 +207,24 @@ UpdateBalls:
     cp a, [hl]
     jr c, .noEnemy3Collision
     
-    ;enemy 1 collision
+    ;enemy 3 collision
+    push bc
+    ld b, SCORE_SMALL
+
+    ld a, [wEnemy3State]
+    cp a, ENEMY_STATE_DOWN
+    jr nz, .lowScore3
+    ld b, SCORE_BIG
+.lowScore3:
+    call PlayerScore
+
+    pop bc
+
     ld a, ENEMY_STATE_HIT
     ld [wEnemy3State], a
     xor a
     ld [wEnemy3Timer], a
-    
-    call PlayerScore
+
     jr .removeBall
 .noEnemy3Collision:
 
