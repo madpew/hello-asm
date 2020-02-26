@@ -392,6 +392,9 @@ PrintScore:
     ld a, [wScoreHighBcd]
     and d
     add a, c
+    ld e, a
+    call WaitVRam
+    ld a, e
     ld [hli], a
 
 	ld a, [wScoreLowBcd]
@@ -399,11 +402,17 @@ PrintScore:
     swap a
     and d
     add a, c
+    ld e, a
+    call WaitVRam
+    ld a, e
     ld [hli], a
 
     ld a, b
     and d
     add a, c
+    ld e, a
+    call WaitVRam
+    ld a, e
     ld [hl], a
 
     ret 

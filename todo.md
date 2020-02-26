@@ -1,7 +1,6 @@
 # Todo
 - animate flowers
 - make better sounds (layer the channels to get richer effects)
-- move hud into window
 
 ## Optional Features (Wishlist)
 ### Phase 1 (likely)

@@ -6,7 +6,7 @@ include "macros.inc"
 include "ram.asm"
 include "interrupts.asm"
 
-DEBUG EQU 1
+DEBUG EQU 0
 
 ;--------------------------------------------------------------------------------------------
 SECTION	"BOOT", ROM0[$0100]
@@ -87,7 +87,7 @@ BootSequence:
 	ldh [rIE], a
 	
 	; turn on screen
-	ld a, LCDCF_OFF | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_WIN9C00 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON 
+	ld a, LCDCF_OFF | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_WIN9C00 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON
 	ldh [rLCDC], a
 	
 	;setup

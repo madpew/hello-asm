@@ -1,6 +1,5 @@
 ; entry point to load this scene
 LoadLoser:
-
 	load_shadow_map CatOverMapData, CATOVER_MAP_SIZE
 	call ClearAllSprites
 
