@@ -416,3 +416,69 @@ PrintScore:
     ld [hl], a
 
     ret 
+
+; @param HL destination address of the first digit
+PrintScoreText:
+
+    ld c, TILEIDX_NUMBERSTEXT
+    ld d, $0f
+
+    ld a, [wScoreHighBcd]
+    and d
+    add a, c
+    ld e, a
+    call WaitVRam
+    ld a, e
+    ld [hli], a
+
+	ld a, [wScoreLowBcd]
+    ld b, a
+    swap a
+    and d
+    add a, c
+    ld e, a
+    call WaitVRam
+    ld a, e
+    ld [hli], a
+
+    ld a, b
+    and d
+    add a, c
+    ld e, a
+    call WaitVRam
+    ld a, e
+    ld [hl], a
+
+    ret 
+
+; Removes leading zeros from the number
+; @param HL destination address of the first digit
+FixScoreText:
+
+    ld c, TILEIDX_EMPTY
+    ld b, TILEIDX_NUMBERSTEXT ;0
+    ld a, [hl]
+    cp a, b
+    ret nz 
+
+    call WaitVRam
+    ld a, c
+    ld [hli], a
+
+    ld a, [hl]
+    cp a, b
+    ret nz 
+
+    call WaitVRam
+    ld a, c
+    ld [hli], a
+
+    ld a, [hl]
+    cp a, b
+    ret nz 
+
+    call WaitVRam
+    ld a, c
+    ld [hli], a
+
+    ret 

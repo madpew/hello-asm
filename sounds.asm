@@ -18,31 +18,42 @@ SoundOn:
 
     ret
 
-SoundTest:
-SfxCatch:
-SfxHit:
-    ld a, $4f
+SfxCatch: ; perfect
+    ld a, $14
     ldh [rNR10], a
-    ld a, $87
+    ld a, $90
 	ldh [rNR11], a 
-    ld a, $f2
+    ld a, $f1
 	ldh [rNR12], a
-    ld a, $ff
+    ld a, $0f
 	ldh [rNR13], a
-    ld a, $87
+    ld a, $c3
 	ldh [rNR14], a
     ret
 
-SfxMiss:
-    ld a, $3c
+SfxHit: ;ok-ish, can use NR4 as well
+    ld a, $37
     ldh [rNR10], a
-    ld a, $80
+    ld a, $00
 	ldh [rNR11], a 
     ld a, $f3
 	ldh [rNR12], a
-    ld a, $9f
+    ld a, $b0
 	ldh [rNR13], a
     ld a, $86
+	ldh [rNR14], a
+    ret
+
+SfxMiss: ;needs shorter nr1
+    ld a, $3b
+    ldh [rNR10], a
+    ld a, $80
+	ldh [rNR11], a 
+    ld a, $f1
+	ldh [rNR12], a
+    ld a, $a0
+	ldh [rNR13], a
+    ld a, $c6
 	ldh [rNR14], a
 
     ld a, $1b
@@ -78,7 +89,18 @@ SfxDmg:
 
     ret 
 
-SfxThrow:
+SfxThrow: ;perfect
+    ld a, $3e
+    ldh [rNR10], a
+    ld a, $80
+	ldh [rNR11], a 
+    ld a, $a2
+	ldh [rNR12], a
+    ld a, $1f
+	ldh [rNR13], a
+    ld a, $87
+	ldh [rNR14], a
+
     ld a, $1f
     ldh [rNR41], a
     ld a, $09

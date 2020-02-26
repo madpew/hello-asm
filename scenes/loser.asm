@@ -4,7 +4,9 @@ LoadLoser:
 	call ClearAllSprites
 
     ld hl, wShadowMap + 32*6 + 7
-	call PrintScore
+	call PrintScoreText
+	ld hl, wShadowMap + 32*6 + 7
+	call FixScoreText
 
 	ret
 

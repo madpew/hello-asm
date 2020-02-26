@@ -31,3 +31,8 @@ LESS EQUS "c"
 GREATER EQUS "nc"
 
 c like "smaller"
+
+openHH 		00 f1 10 80
+closed HH	1f 71 10 c0
+snare 		00 73 51 80
+bd 			4a bf f1 ff 83 (NR1)

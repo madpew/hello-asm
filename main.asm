@@ -74,8 +74,10 @@ BootSequence:
 	call ClearAllSprites
 	
 	; setup timer
-	;seta [rTMA], 190 ;~60 fps
-	;seta [rTAC], TACF_START | TACF_4KHZ
+	;ld a, 0 ;190 = ~60 fps, 124 = 30 fps, 58 = 20 fps
+	;ldh [rTMA], a
+	;ld a, TACF_START | TACF_4KHZ
+	;ldh [rTAC], a
 	
 	ld a, STATF_LYC ; | STATF_MODE00
 	ldh [rSTAT], a
@@ -83,7 +85,7 @@ BootSequence:
 	xor a
 	ldh [rLYC], a
 	
-	ld a, IEF_VBLANK | IEF_LCDC
+	ld a, IEF_VBLANK | IEF_LCDC ;| IEF_TIMER
 	ldh [rIE], a
 	
 	; turn on screen
@@ -92,7 +94,9 @@ BootSequence:
 	
 	;setup
 	call InitializeDMA
-	
+
+	call MusicInit
+
 	ei ; enable interrupts 
 
 	jp GameInit
@@ -140,8 +144,11 @@ ENDC
 	res IEF_VBLANK, a	; reset vblank flag
 	ld [wInterruptFlags], a
 
+	call MusicUpdate
+
 	jp GameLoop
 
 include "utils.asm"
 include "sounds.asm"
 include "game.asm"
+include "music.asm"

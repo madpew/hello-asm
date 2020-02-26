@@ -52,20 +52,20 @@ LoadFight:
     set_sprite_addr wSpritePlayerPawLeft, 144+16, 100-8, TILEIDX_PAWLEFT, 0
     set_sprite_addr wSpritePlayerBall, 144+16, 100+16+2, TILEIDX_BALL, 0
 
-    set_sprite_addr wEnemySprites,      ENEMY_Y + 8, 0, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 4,  ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites,      ENEMY_Y + 8, 0, TILEIDX_WALLDARK, 0
+    set_sprite_addr wEnemySprites + 4,  ENEMY_Y + 8, 0, TILEIDX_WALLDARK, 0
     set_sprite_addr wEnemySprites + 8,  ENEMY_Y +4, 0, TILEIDX_FACELEFTUP, 0
     set_sprite_addr wEnemySprites + 12, ENEMY_Y +4, 0, TILEIDX_FACERIGHTUP, 0
     set_sprite_addr wEnemySprites + 16, 0, 0, TILEIDX_PAWBALL, 0
     
-    set_sprite_addr wEnemySprites + 20, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 24, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 20, ENEMY_Y + 8, 0, TILEIDX_WALLDARK, 0
+    set_sprite_addr wEnemySprites + 24, ENEMY_Y + 8, 0, TILEIDX_WALLDARK, 0
     set_sprite_addr wEnemySprites + 28, ENEMY_Y+7, 0, TILEIDX_FACELEFTUP, 0
     set_sprite_addr wEnemySprites + 32, ENEMY_Y+7, 0, TILEIDX_FACERIGHTUP, 0
     set_sprite_addr wEnemySprites + 36, 0, 0, TILEIDX_PAWBALL, 0
 
-    set_sprite_addr wEnemySprites + 40, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
-    set_sprite_addr wEnemySprites + 44, ENEMY_Y + 8, 0, TILEIDX_WALL, 0
+    set_sprite_addr wEnemySprites + 40, ENEMY_Y + 8, 0, TILEIDX_WALLDARK, 0
+    set_sprite_addr wEnemySprites + 44, ENEMY_Y + 8, 0, TILEIDX_WALLDARK, 0
     set_sprite_addr wEnemySprites + 48, ENEMY_Y+7, 0, TILEIDX_FACELEFTUP, 0
     set_sprite_addr wEnemySprites + 52, ENEMY_Y+7, 0, TILEIDX_FACERIGHTUP, 0
     set_sprite_addr wEnemySprites + 56, 0, 0, TILEIDX_PAWBALL, 0
@@ -457,9 +457,21 @@ UpdateHUDBallStatus:
     ret
 
 ;Animates the grass
+
+; replaces the value in A if it matches \1 with \2
+replace_tile: MACRO ; \1 \2 tileids
+    cp a, \1
+	jr nz, .done\@
+	ld a, \2
+    ld [hl], a
+    jr .checkNext
+.done\@:
+    ENDM
+
+
 AnimateGrass:
 	ld a, [wFrames]
-	and %00011111 ; animation speed divider, careful not to sync with shadow-map copy interval or animation will not be visible (more than 16)
+	and %00001111 ; animation speed divider, careful not to sync with shadow-map copy interval or animation will not be visible (more than 16)
 	jr nz, .noAnimation
 	ld hl, wShadowMap + 32*4
     ld a, [wFrames]
@@ -474,18 +486,20 @@ AnimateGrass:
     dec hl
 	jr .checkNext
 .animate:
-	ld a, [hl]
-	cp a, 85
-	jr nz, .check86
-	inc a
-	ld [hl], a
-	jr .checkNext
-.check86	
-	cp a, 86
-	jr nz, .checkNext
-	dec a
-	ld [hl], a
 
+	ld a, [hl]
+	replace_tile 85, 86
+    replace_tile 86, 85
+
+    replace_tile 88, 87
+    replace_tile 87, 88
+
+    replace_tile 108, 109
+    replace_tile 109, 108
+
+    replace_tile 110, 111
+    replace_tile 111, 110
+    
 .checkNext:	
 	inc hl
     inc hl

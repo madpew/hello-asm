@@ -1,12 +1,29 @@
 ; entry point to load this scene
 LoadWinner:
     ;update map
-	;load_shadow_map winnerdata, winnersize
+	;todo: check score and either load win or harder
+	ld a, [wScoreHighBcd]
+	and a
+	jr nz, .winner
+
+	ld a, [wScoreLowBcd]
+	swap a
+	and $0f
+	cp a, 4
+	jr nc, .winner
+
+	load_shadow_map CatHarderMapData, CATHARDER_MAP_SIZE
+	jr .switchDone
+.winner:
 	load_shadow_map CatWinMapData, CATWIN_MAP_SIZE
+.switchDone:
+
 	call ClearAllSprites
 
     ld hl, wShadowMap + 32*4 + 2
-	call PrintScore
+	call PrintScoreText
+	ld hl, wShadowMap + 32*4 + 2
+	call FixScoreText
     
 	ret
 
