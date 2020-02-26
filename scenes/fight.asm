@@ -3,8 +3,15 @@ include "game/ai.asm"
 
 ; entry point to load this scene
 LoadFight:
+	di 
+    call TurnScreenOff
 
+    load_win CatHudMapData, CATHUD_MAP_SIZE
     load_shadow_map CatGroundMapData, CATGROUND_MAP_SIZE
+
+	ld a, 128
+	ldh [rLYC], a
+
     call ClearAllSprites
     call SfxMew ;test sound
 
@@ -73,6 +80,9 @@ LoadFight:
     call GetNextRandom
     and %00111111
     ld [wEnemy3Timer], a
+
+    call TurnScreenOn
+	ei
 	ret
 
 
@@ -372,13 +382,12 @@ TickFight:
 ; Updates the player score
 PlayerScore:
     push af
-    push bc
     push de
     push hl
 
     ;increase score
     ld a, [wScoreLowBcd]
-    add a, 4 ;debug add 4 each click
+    add a, b
     daa
     ld [wScoreLowBcd], a
     ld b, a
@@ -389,13 +398,12 @@ PlayerScore:
     ld [wScoreHighBcd], a
 
     ;update score-display
-    ld hl, wShadowMap + 32*17 + 16
+    ld hl, _SCRN1 + 32 + 16
 	call PrintScore
     call SfxHit
     
     pop hl
     pop de
-    pop bc
     pop af
     
     ret
@@ -417,8 +425,9 @@ PlayerHit:
     ;a has lives (use as offset)
     ld b, 0
     ld c, a
-    ld hl, wShadowMap + 32*17 + 1
+    ld hl, _SCRN1 + 32 + 1
     add hl, bc
+    call WaitVRam
     ld [hl], TILEIDX_HEARTEMPTY
     call SfxDmg
     ld a, HIT_DURATION
@@ -439,7 +448,8 @@ UpdateHUDBallStatus:
     jr nz, .hasBall
     ld b, TILEIDX_ENERGYEMPTY
 .hasBall:
-    ld hl, wShadowMap + 32*17 + 10
+    call WaitVRam
+    ld hl, _SCRN1 + 32 + 10
     ld [hl], b
 
     pop bc

@@ -1,6 +1,5 @@
 ; entry point to load this scene
 LoadIntro:
-
 	di
 	call TurnScreenOff
 

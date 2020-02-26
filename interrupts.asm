@@ -45,7 +45,7 @@ DMACode:
 	ret
 DMACodeEnd:
 
-SHADOWMAP_CHUNKS EQU 16
+SHADOWMAP_CHUNKS EQU 9
 SHADOWMAP_CHUNK_SIZE EQU 64
 
 InterruptVBlank:
@@ -124,6 +124,10 @@ InterruptVBlank:
 	ldh [rSCX], a
 	ld a, [wCamScrollY]
 	ldh [rSCY], a
+
+	ldh a, [rLCDC]
+	res 3, a
+	ldh [rLCDC], a
 	
 	;set vblank flag
 	ld hl, wInterruptFlags
@@ -137,7 +141,20 @@ InterruptVBlank:
 SECTION "HSYNC", ROM0
 InterruptLCDC:
 	push af
+	
+	ld a, [wCurrentScene]
+	cp 2 ;scene game
+	jr nz, .done
+	
+	;switch screens
+	ldh a, [rLCDC]
+	set 3, a
+	ldh [rLCDC], a
 
+	ld a, 132
+	ldh [rSCY], a
+
+.done:
 	pop af
 
 	reti

@@ -132,15 +132,15 @@ AIStateAim:
     and a
     jr nz, ProcessEnemy.done ;keep waiting 
 
-
     ;aiming is done
+    call GetNextRandom
+    and %00001000 ;50% chance, random bit
     ld a, ENEMY_TIME_THROW
     ld [hl], a
-
-    call GetNextRandom
-    and %00001001
     ld a, ENEMY_STATE_THROW
     jr nz, .throw
+    xor a
+    ld [hl], a
     ld a, ENEMY_STATE_DOWN
 .throw:
     inc hl
@@ -349,7 +349,6 @@ GetSpawnX:
 
     ld a, d
 
-    ;result is ok!
     pop de
     pop bc
 

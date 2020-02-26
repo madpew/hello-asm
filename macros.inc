@@ -70,12 +70,23 @@ load_shadow_map : MACRO
 	call QueueShadowUpdate
     ENDM
 
-; Copies data to the shadow-map and queues the update
+
+; Copies data to the map vram
 ; @param \1 Label of the data to copy
 ; @param \2 2-byte size (w/h) of the area to copy
 load_map : MACRO
 	ld de, \1
 	ld hl, _SCRN0
+	ld bc, \2
+	call MemCopyBlock
+    ENDM
+
+; Copies data to the window vram
+; @param \1 Label of the data to copy
+; @param \2 2-byte size (w/h) of the area to copy
+load_win : MACRO
+	ld de, \1
+	ld hl, _SCRN1
 	ld bc, \2
 	call MemCopyBlock
     ENDM
