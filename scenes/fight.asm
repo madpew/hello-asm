@@ -6,6 +6,8 @@ LoadFight:
 	di 
     call TurnScreenOff
 
+	music_play Music_shortSongData, MUSIC_SHORT_SPEED
+
     load_win CatHudMapData, CATHUD_MAP_SIZE
     load_shadow_map CatGroundMapData, CATGROUND_MAP_SIZE
 

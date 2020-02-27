@@ -265,20 +265,20 @@ AIStateDown:
     pop hl
     push hl
 
-    ; sleeptime can stay at 0 (for fast scrolling)
     ld bc, 3
     add hl, bc
-
     ; now points at enemyY
-    ; move up
+    ; move down
     ld a, [hl]
     inc a
     ld [hld], a
     cp a, ENEMY_Y + 8
     jr nz, .continue
 
+    ;points at X (move offscreen)
+    ld a, 167
+    ld [hld], a
     ;advance state
-    dec hl
     ld a, ENEMY_STATE_WAIT
     ld [hl], a
 
@@ -307,7 +307,7 @@ GetSpawnX:
     ; check new X(left) against existing enemy-locations
     ld a, [wEnemy1X]
     ld b, a
-    add a, 16
+    add a, 24
     ld c, a
     ld a, d
     ;a = newX, b = enemy1x, c = enemy1x + 24
@@ -321,7 +321,7 @@ GetSpawnX:
 
     ld a, [wEnemy2X]
     ld b, a
-    add a, 16
+    add a, 24
     ld c, a
     ld a, d
     ;d = newX, b = enemy1x, c = enemy1x + 15
@@ -335,7 +335,7 @@ GetSpawnX:
 
     ld a, [wEnemy3X]
     ld b, a
-    add a, 16
+    add a, 24
     ld c, a
     ld a, d
     ;d = newX, b = enemy1x, c = enemy1x + 15

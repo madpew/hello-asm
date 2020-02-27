@@ -110,3 +110,11 @@ lookup_jump : MACRO ; Requires offset (index *2) in BC \1 table-address
 	; jump
 	jp hl
 	ENDM
+
+; @param \1 Address of Songdata
+; @param \2 Speed
+music_play : MACRO
+	ld hl, \1
+    ld a, \2
+    call MusicStartSong
+	ENDM

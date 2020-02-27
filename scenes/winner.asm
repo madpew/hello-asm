@@ -1,7 +1,8 @@
 ; entry point to load this scene
 LoadWinner:
     ;update map
-	;todo: check score and either load win or harder
+	
+
 	ld a, [wScoreHighBcd]
 	and a
 	jr nz, .winner
@@ -24,7 +25,9 @@ LoadWinner:
 	call PrintScoreText
 	ld hl, wShadowMap + 32*4 + 2
 	call FixScoreText
-    
+
+	music_play Music_winSongData, MUSIC_WIN_SPEED
+
 	ret
 
 ; entry point each frame

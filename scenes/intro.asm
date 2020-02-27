@@ -12,6 +12,9 @@ LoadIntro:
 	load_shadow_map CatIntroMapData, CATINTRO_MAP_SIZE
 
 	call ClearAllSprites
+
+	music_play Music_waitSongData, MUSIC_WAIT_SPEED
+
 	call TurnScreenOn
 	ei
 	ret
