@@ -113,6 +113,37 @@ MusicInit:
     ld [wMusicStatus], a
     ld [wMusicSpeedDivider], a
 
+    ldh [rAUDVOL], a
+    ldh [rAUDTERM], a
+    ldh [rAUDENA], a
+
+    ldh [$FF30], a
+    ldh [$FF31], a
+    ldh [$FF32], a
+    ldh [$FF33], a
+    ldh [$FF34], a
+    ldh [$FF35], a
+    ldh [$FF36], a
+    ldh [$FF37], a
+    xor $ff
+    ldh [$FF38], a
+    ldh [$FF39], a
+    ldh [$FF3A], a
+    ldh [$FF3B], a
+    ldh [$FF3C], a
+    ldh [$FF3D], a
+    ldh [$FF3E], a
+    ldh [$FF3F], a
+
+    ld a, $8f
+    ldh [rAUDENA], a
+
+    ld a, $ff
+    ldh [rAUDTERM], a
+
+    ld a, $77
+    ldh [rAUDVOL], a
+
     ;ld hl, DemoSongData
     ;ld a, DEMOSONG_SPEED
     ;call MusicStartSong    
@@ -276,7 +307,7 @@ PlayNoteCh3:
     ;channel 3
     ld a, $80
     ldh [rNR30], a
-    ld a, $df
+    ld a, $cf
     ldh [rNR31], a
     ld a, $20
     ldh [rNR32], a

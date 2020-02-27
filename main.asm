@@ -128,10 +128,19 @@ ENDC
 	ld a, [wFrameCounter]
 	inc a
 	ld [wFrameCounter], a
-   
+
 	call UpdateInputState
+	
+	call MusicUpdate
 
 	call GameTick
+
+IF DEBUG
+	;debug length of gamecode (turn palette back to normal)
+	ldh a, [rBGP]
+	xor $ff
+	ldh [rBGP], a
+ENDC
 
 IF DEBUG
 	;debug length of gamecode (turn palette back to normal)
@@ -143,8 +152,6 @@ ENDC
 	ld a, [wInterruptFlags]
 	res IEF_VBLANK, a	; reset vblank flag
 	ld [wInterruptFlags], a
-
-	call MusicUpdate
 
 	jp GameLoop
 

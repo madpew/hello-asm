@@ -1,8 +1,11 @@
 # Todo
-- add music (custom music format or go with a proven solution)
-
+write music for:
+  - game over
+  - game
+  - help
+  - menu entry
+  - menu ongoing
 # KNOWN BUGS
-- remove wall sprites when enemy is finished with "down"
 
 ## Optional Features (Wishlist)
 ### Phase 1 (likely)
