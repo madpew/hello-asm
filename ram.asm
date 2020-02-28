@@ -78,7 +78,7 @@ wTime: ds 1
 
 ;wStage: ds 1
 wHitEffectCounter: ds 1
-HIT_DURATION EQU 20
+HIT_DURATION EQU 7
 
 wPlayerX: ds 1
 wPlayerFlags: ds 1

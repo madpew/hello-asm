@@ -20,7 +20,8 @@ SECTION	"BOOT", ROM0[$0100]
 	db $00,$08,$11,$1F,$88,$89,$00,$0E,$DC,$CC,$6E,$E6,$DD,$DD,$D9,$99
 	db $BB,$BB,$67,$63,$6E,$0E,$EC,$CC,$DD,$DC,$99,$9F,$BB,$B9,$33,$3E
 
-	db "HELLOASM",0,0,0,0,0,0,0	; 15 bytes
+	db "BATTLEGROUNDS__"	; 15 bytes
+	;db 190,0
 	db 0                        ; $143
 	db 0, 0                     ; $144 - Licensee code (not important)
 	db 0                        ; $146 - SGB Support indicator
@@ -28,7 +29,8 @@ SECTION	"BOOT", ROM0[$0100]
 	db 0				        ; $148 - ROM Size
 	db 0				        ; $149 - RAM Size
 	db 1                        ; $14a - Destination code
-	db $33                      ; $14b - Old licensee code
+	;db $33                      ; $14b - Old licensee code
+	db $1                       ; $14b - Old licensee code
 	db 0                        ; $14c - Mask ROM version
 	db 0                        ; $14d - Complement check (important)
 	dw 0                        ; $14e - Checksum (not important)
@@ -49,8 +51,9 @@ BootSequence:
     ldh [rLCDC], a
 	
 	; palette setup
-	ld a, %11100100
+	ldh a, [rBGP]
 	ld [wPaletteBg], a
+	ld a, %11100100
 	ld [wPaletteObj0], a
 	ld [wPaletteObj1], a
 	
@@ -134,13 +137,6 @@ ENDC
 	call MusicUpdate
 
 	call GameTick
-
-IF DEBUG
-	;debug length of gamecode (turn palette back to normal)
-	ldh a, [rBGP]
-	xor $ff
-	ldh [rBGP], a
-ENDC
 
 IF DEBUG
 	;debug length of gamecode (turn palette back to normal)

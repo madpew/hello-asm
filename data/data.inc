@@ -4,7 +4,8 @@ SomeString:
 SomeStringEnd:
 
 include "data/gfx.inc"
-include "data/music_win.inc"
-include "data/music_short.inc"
-include "data/music_intro.inc"
-include "data/music_wait.inc"
+include "data/MusicLost.inc"
+include "data/MusicWin.inc"
+include "data/MusicMenu.inc"
+include "data/MusicMenuStart.inc"
+include "data/MusicGame.inc"

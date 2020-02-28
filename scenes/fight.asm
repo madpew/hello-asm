@@ -6,8 +6,8 @@ LoadFight:
 	di 
     call TurnScreenOff
 
-	music_play Music_shortSongData, MUSIC_SHORT_SPEED
-
+	music_play MusicGameSongData, MUSICGAME_SPEED
+    
     load_win CatHudMapData, CATHUD_MAP_SIZE
     load_shadow_map CatGroundMapData, CATGROUND_MAP_SIZE
 
@@ -48,10 +48,10 @@ LoadFight:
     ld [wEnemy3Y], a
     ld [wEnemy3State], a
 
-    set_sprite_addr wSpritePlayerLeft, PLAYER_Y, 100, TILEIDX_PLAYERLEFT, 0
-    set_sprite_addr wSpritePlayerRight, PLAYER_Y, 100+8, TILEIDX_PLAYERRIGHT, 0
-    set_sprite_addr wSpritePlayerPawRight, 144+16, 100+16, TILEIDX_PLAYERPAWRIGHT, 0
-    set_sprite_addr wSpritePlayerPawLeft, 144+16, 100-8, TILEIDX_PAWLEFT, 0
+    set_sprite_addr wSpritePlayerLeft, PLAYER_Y, 100, TILEIDX_PLAYERLEFT, $10
+    set_sprite_addr wSpritePlayerRight, PLAYER_Y, 100+8, TILEIDX_PLAYERRIGHT, $10
+    set_sprite_addr wSpritePlayerPawRight, 144+16, 100+16, TILEIDX_PLAYERPAWRIGHT, $10
+    set_sprite_addr wSpritePlayerPawLeft, 144+16, 100-8, TILEIDX_PAWLEFT, $10
     set_sprite_addr wSpritePlayerBall, 144+16, 100+16+2, TILEIDX_BALL, 0
 
     set_sprite_addr wEnemySprites,      ENEMY_Y + 8, 0, TILEIDX_WALLDARK, 0
@@ -195,6 +195,11 @@ TickFight:
 .noScrollSky:
 
 ; hit effect
+    
+    ld a, [wFrames]
+    and %00000011
+    jr nz, .noHitEffect
+
     ld a, [wHitEffectCounter]
     and a
     jr z, .noHitEffect
@@ -259,20 +264,6 @@ TickFight:
     add a, c
     ld [hl], a
 .noTimerUpdate:
-
-
-; debug input handling    
-;IF DEBUG
-
-    is_key_pressed KEY_START
-    jr z, .noStart
-    call GetNextRandom
-    srl a
-    ld d, a
-    call SpawnEnemyBall
-.noStart:    
-
-;ENDC
 
 
 ; skip player input if we're hit
@@ -341,6 +332,26 @@ TickFight:
 .noRight:  
 
 .skipInput:
+
+; PAUSE
+
+    is_key_released KEY_START
+    jr  z, .noPause
+
+    ldh a, [rIE]
+    push af
+
+    xor a
+    ldh [rIE], a
+    ldh [rP1], a
+
+    STOP
+
+    pop af
+    ldh [rIE], a
+	xor a
+	ld [wInputState], a
+.noPause:
 
 ; Paw Rendering
 .checkArm:

@@ -22,6 +22,9 @@ Sprite Priority doesn't work how I anticipated. Thus some parts of the code shou
 Sprites are sorted by: Y Coordinate > X Coordinate > OAM-Index
 Priority is just "over write BG" or "only overwrite white background" instead of OAM-Priority.
 
+### Palette on the real DMG and Auto-Color on GBA/GBC
+
+
 ### remembering cp flags
 CP A, X
 c: A < X

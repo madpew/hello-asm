@@ -174,5 +174,7 @@ TickLogo:
     cp 150
     ret nz    
 	
+    music_play MusicMenuStartSongData, MUSICMENUSTART_SPEED
+    
     switch_scene SCENE_INTRO
 	ret

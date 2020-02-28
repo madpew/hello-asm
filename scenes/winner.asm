@@ -26,7 +26,7 @@ LoadWinner:
 	ld hl, wShadowMap + 32*4 + 2
 	call FixScoreText
 
-	music_play Music_winSongData, MUSIC_WIN_SPEED
+	music_play MusicWinSongData, MUSICWIN_SPEED
 
 	ret
 
@@ -37,7 +37,7 @@ TickWinner:
 	ld hl, _VRAM
 	call ScrollTileRightHBlank
 
-	is_key_pressed KEY_START
+	is_key_released KEY_START
 	ret z
 
     switch_scene SCENE_INTRO

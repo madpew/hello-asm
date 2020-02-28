@@ -45,6 +45,10 @@ sla b ;4
 sla b ;8
 sla b ;16
 
+.waitVRAMBusy:
+    ldh a, [rSTAT]
+    and STATF_BUSY
+    jr z, .waitVRAMBusy
 .waitVRAMReady:
     ldh a, [rSTAT]
     and STATF_BUSY
@@ -189,24 +193,24 @@ UpdateInputState:
     
     ; Read D-pad
 	ld a, $20
-    ldh [_HW], a 
+    ldh [rP1], a 
 
-    ldh a, [_HW]
-    ldh a, [_HW]
+    ldh a, [rP1]
+    ldh a, [rP1]
     cpl
     and $0f
     ld b, a 
     
     ; Read buttons (Start, Select, B, A)
     ld a, $10
-    ldh [_HW], a 
+    ldh [rP1], a 
 
-    ldh a, [_HW]
-    ldh a, [_HW]
-    ldh a, [_HW]
-    ldh a, [_HW]
-    ldh a, [_HW]
-    ldh a, [_HW]
+    ldh a, [rP1]
+    ldh a, [rP1]
+    ldh a, [rP1]
+    ldh a, [rP1]
+    ldh a, [rP1]
+    ldh a, [rP1]
 
     cpl
     and $0f
@@ -217,7 +221,7 @@ UpdateInputState:
     ld b, a 
     
     ld a, $30
-    ldh [_HW], a
+    ldh [rP1], a
     
     ;b contains current inputstate
     ld a, [wInputState]

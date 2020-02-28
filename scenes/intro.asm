@@ -3,6 +3,9 @@ LoadIntro:
 	di
 	call TurnScreenOff
 
+	ld a, %11100100
+	ld [wPaletteBg], a
+
 	ld hl, GfxTileData
 	ld bc, GFX_TILE_LENGTH
 	ld de, _VRAM
@@ -13,8 +16,6 @@ LoadIntro:
 
 	call ClearAllSprites
 
-	music_play Music_waitSongData, MUSIC_WAIT_SPEED
-
 	call TurnScreenOn
 	ei
 	ret
@@ -23,18 +24,20 @@ LoadIntro:
 ; do vblank stuff first
 TickIntro:
 
+	music_switch MusicMenuSongData, MUSICMENU_SPEED
+
 	; cycle the LFSR to "seed"
 	call GetNextRandom
 
 	; START the game
-	is_key_pressed KEY_START
+	is_key_released KEY_START
 	jr z, .noSwitchGame
 	switch_scene SCENE_GAME
 	ret
 .noSwitchGame:
 
     ; SELECT the tutorial 
-    is_key_pressed KEY_SELECT
+    is_key_released KEY_SELECT
 	jr z, .noSwitchHelp
     switch_scene SCENE_HELP
 	ret

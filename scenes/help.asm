@@ -13,7 +13,7 @@ TickHelp:
 	ld hl, _VRAM
 	call ScrollTileRightHBlank
 
-    is_key_pressed KEY_SELECT
+    is_key_released KEY_SELECT
 	ret z
 
 	switch_scene SCENE_INTRO

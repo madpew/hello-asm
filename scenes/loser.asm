@@ -8,6 +8,8 @@ LoadLoser:
 	ld hl, wShadowMap + 32*6 + 7
 	call FixScoreText
 
+	music_play MusicLostSongData, MUSICLOST_SPEED
+
 	ret
 
 ; entry point each frame
@@ -18,7 +20,7 @@ TickLoser:
 	ld hl, _VRAM
 	call ScrollTileLeftHBlank
 	
-	is_key_pressed KEY_START
+	is_key_released KEY_START
 	ret z
 
     switch_scene SCENE_INTRO

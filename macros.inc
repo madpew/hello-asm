@@ -47,6 +47,17 @@ is_key_pressed : MACRO
 
 ; @param \1 The keycode defined in the KEY enum.
 ; @result Z flag
+is_key_released : MACRO
+    ld a, [wInputChanged]
+    and \1
+    ld b, a
+    ld a, [wInputState]
+	xor a, $ff
+    and b
+    ENDM
+
+; @param \1 The keycode defined in the KEY enum.
+; @result Z flag
 is_key_held : MACRO
 	ld a, [wInputState]
     and \1
@@ -55,6 +66,8 @@ is_key_held : MACRO
 ; Calls the Load-Function of the Scene set in the jump table
 ; @param \1 The scene number to load. (use SCENE enum)
 switch_scene : MACRO
+	xor a
+	ld [wInputState], a
 	ld a, \1
     call GameLoadScene
     ENDM
@@ -117,4 +130,21 @@ music_play : MACRO
 	ld hl, \1
     ld a, \2
     call MusicStartSong
+	ENDM
+
+music_stop : MACRO
+	xor a
+	ld [wMusicStatus], a
+	ENDM
+
+; @param \1 Address of Songdata
+; @param \2 Speed
+music_switch : MACRO
+    ld a, [wMusicStatus]
+	and a
+	jr nz,.noSwitch\@
+	ld hl, \1
+    ld a, \2
+    call MusicStartSong
+.noSwitch\@:	
 	ENDM

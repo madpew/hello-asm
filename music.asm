@@ -286,12 +286,12 @@ PlayNoteCh2:
 
     ld a, $80
     ldh [rNR21], a
-    ld a, $84
+    ld a, $54
     ldh [rNR22], a
     ld a, [hli]
     ldh [rNR23], a
     ld a, [hl]
-    or a, $80
+    or a, $C0
     ldh [rNR24], a
     pop hl
     ret
@@ -307,9 +307,9 @@ PlayNoteCh3:
     ;channel 3
     ld a, $80
     ldh [rNR30], a
-    ld a, $cf
+    ld a, $df
     ldh [rNR31], a
-    ld a, $20
+    ld a, $40 ;20 for full volume
     ldh [rNR32], a
     ld a, [hli]
     ldh [rNR33], a
