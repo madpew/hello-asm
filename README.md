@@ -1,10 +1,11 @@
 # hello-asm
-A barebones example that goes beyond the usual Hello-World for the original Gameboy.
+A barebones example game that goes beyond the usual Hello-World for the original Gameboy.
 
-It is a very basic but complete game. 
+You can play the game on [itch.io](https://madpew.itch.io/madpews-battleground) or build it yourself from source!
 
-![catgame_title](https://github.com/madpew/hello-asm/blob/master/catgame_title.gif)![catgame_game](https://github.com/madpew/hello-asm/blob/master/catgame_game.gif)
-
+![GBC](https://madpew.at/assets/battleground/battleground_ingame.png)
+![DMG](https://madpew.at/assets/battleground/battleground_ingame2.png)
+![Gameplay](https://madpew.at/assets/battleground/battleground_gameplay.gif)
 
 
 ## The story so far
@@ -19,13 +20,11 @@ Ideally, once completed, this could be turned into a tutorial/article-series tha
 This is a living repository and might get a bit messy while I'm working on new things.
 
 
-
 ## Caution
 
 - This project is a work in progress and should not be considered bug-free.
 - Faulty software can harm your real gameboy hardware.
 - I'm not an expert, use with care at your own risk (if you plan on run it on the real hardware anyways).
-
 
 
 ## Usage

@@ -2,13 +2,6 @@ Ideas for optimizations:
 
 CAUTION: Do not optimize if not required to keep the code clean (easier to read and understand + reuse)
 
-ShadowMap:
-    Since the whole game doesn't scroll, the shadow-map could be sped up by only copying the 20x18 area instead of the whole map.
-
-General:
-    Optimize calls by using RST Vectors: e.g. put "jp hl" at offset $8 and  use "rst $8" instead of "call _hl"
-
-
 # Topics for future research
 
 - look into meta-tiles, meta-maps and meta sprites
@@ -23,7 +16,6 @@ Sprites are sorted by: Y Coordinate > X Coordinate > OAM-Index
 Priority is just "over write BG" or "only overwrite white background" instead of OAM-Priority.
 
 ### Palette on the real DMG and Auto-Color on GBA/GBC
-
 
 ### remembering cp flags
 CP A, X

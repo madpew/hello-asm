@@ -20,8 +20,8 @@ SECTION	"BOOT", ROM0[$0100]
 	db $00,$08,$11,$1F,$88,$89,$00,$0E,$DC,$CC,$6E,$E6,$DD,$DD,$D9,$99
 	db $BB,$BB,$67,$63,$6E,$0E,$EC,$CC,$DD,$DC,$99,$9F,$BB,$B9,$33,$3E
 
-	db "BATTLEGROUNDS__"	; 15 bytes
-	;db 190,0
+	db "BATTLEGROUND"	
+	db 0,0,17 ; 15 bytes
 	db 0                        ; $143
 	db 0, 0                     ; $144 - Licensee code (not important)
 	db 0                        ; $146 - SGB Support indicator
@@ -51,8 +51,10 @@ BootSequence:
     ldh [rLCDC], a
 	
 	; palette setup
-	ldh a, [rBGP]
+	;ldh a, [rBGP]
+	ld a, %11111100
 	ld [wPaletteBg], a
+	ldh [rBGP], a
 	ld a, %11100100
 	ld [wPaletteObj0], a
 	ld [wPaletteObj1], a
