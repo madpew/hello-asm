@@ -1,7 +1,7 @@
-SECTION "DATA BANK", ROMX  
-SomeString:
-	DB	"Hello Data Bank!"
-SomeStringEnd:
+SECTION "DATA BANK", ROM0  
+;SomeString:
+;	DB	"Hello Data Bank!"
+;SomeStringEnd:
 
 include "data/gfx.inc"
 include "data/MusicLost.inc"
